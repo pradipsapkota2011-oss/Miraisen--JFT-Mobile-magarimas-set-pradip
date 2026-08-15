@@ -2209,3 +2209,41 @@ body.feedback-mode{
     z-index:100 !important;
   }
 }
+
+
+/* =========================================================
+   SECTION-WISE RESULT GUARANTEED FIX
+   ========================================================= */
+#sectionPercentText{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  width:100% !important;
+  height:auto !important;
+  max-height:none !important;
+  overflow:visible !important;
+}
+
+html.result-mode,
+body.result-mode{
+  height:auto !important;
+  min-height:100% !important;
+  max-height:none !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch !important;
+}
+
+body.result-mode #appShell,
+body.result-mode #resultPage,
+body.result-mode .resultBody{
+  display:block !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow:visible !important;
+}
+
+body.result-mode .resultBody{
+  padding-bottom:110px !important;
+}
