@@ -231,6 +231,7 @@ function getSectionDefinitions(){
   let listeningStart = -1;
   let readingStart = -1;
 
+  // First choice: use section values already present in questions.js.
   for(let i = 0; i < total; i++){
     const bucket = getQuestionSectionBucket(questions[i]);
 
@@ -247,21 +248,41 @@ function getSectionDefinitions(){
     }
   }
 
-  // Safe fallbacks keep the sections in valid order.
-  if(conversationStart < 0){
-    conversationStart = listeningStart >= 0
-      ? listeningStart
-      : (readingStart >= 0 ? readingStart : total);
-  }
+  // IMPORTANT:
+  // Some Kawai/Kudamono-style question files do not store q.section
+  // on every question. In that case use the same section boundaries
+  // used by those sets:
+  //   Q1-16  Script & Vocabulary
+  //   Q17-28 Conversation & Expression
+  //   Q29-37 Listening
+  //   Q38+   Reading
+  const hasUsefulSectionMetadata =
+    conversationStart >= 0 ||
+    listeningStart >= 0 ||
+    readingStart >= 0;
 
-  if(listeningStart < 0){
-    listeningStart = readingStart >= 0
-      ? readingStart
-      : total;
-  }
+  if(!hasUsefulSectionMetadata){
+    conversationStart = Math.min(16, total);
+    listeningStart = Math.min(28, total);
+    readingStart = Math.min(37, total);
+  }else{
+    if(conversationStart < 0){
+      conversationStart = Math.min(16, total);
+    }
 
-  if(readingStart < 0){
-    readingStart = total;
+    if(listeningStart < 0){
+      listeningStart = Math.max(
+        conversationStart,
+        Math.min(28, total)
+      );
+    }
+
+    if(readingStart < 0){
+      readingStart = Math.max(
+        listeningStart,
+        Math.min(37, total)
+      );
+    }
   }
 
   conversationStart = Math.max(0, Math.min(conversationStart, total));
@@ -735,27 +756,94 @@ function getSectionWiseStats(){
 }
 
 function getSectionWisePercentHtml(){
+  const stats = getSectionWiseStats();
+
   return `
-    <section class="section-performance">
-      <h2>Section-wise Performance</h2>
-      <div class="section-performance-grid">
-        ${getSectionWiseStats().map(section => `
-          <div class="section-performance-card">
-            <div class="section-performance-title">${section.name}</div>
-            <div class="section-performance-row">
+    <div style="
+      display:block !important;
+      width:100% !important;
+      margin:22px 0 28px !important;
+      padding-top:16px !important;
+      border-top:1px solid #d8d8d8 !important;
+      box-sizing:border-box !important;
+    ">
+      <div style="
+        display:block !important;
+        font-size:20px !important;
+        line-height:1.3 !important;
+        font-weight:800 !important;
+        color:#111 !important;
+        margin:0 0 12px !important;
+      ">
+        Section-wise Performance
+      </div>
+
+      <div style="
+        display:grid !important;
+        grid-template-columns:1fr !important;
+        gap:10px !important;
+        width:100% !important;
+      ">
+        ${stats.map(section => `
+          <div style="
+            display:block !important;
+            width:100% !important;
+            background:#f7f7f7 !important;
+            border:1px solid #ddd !important;
+            border-radius:9px !important;
+            padding:12px !important;
+            box-sizing:border-box !important;
+          ">
+            <div style="
+              font-size:14px !important;
+              font-weight:800 !important;
+              margin-bottom:7px !important;
+            ">
+              ${section.name}
+            </div>
+
+            <div style="
+              display:flex !important;
+              justify-content:space-between !important;
+              align-items:center !important;
+              gap:8px !important;
+              margin-bottom:8px !important;
+            ">
               <span>${section.correct} / ${section.total} correct</span>
-              <strong>${section.percentage}%</strong>
+              <strong style="font-size:18px !important;">
+                ${section.percentage}%
+              </strong>
             </div>
-            <div class="section-performance-bar">
-              <div class="section-performance-fill" style="width:${section.percentage}%"></div>
+
+            <div style="
+              display:block !important;
+              width:100% !important;
+              height:9px !important;
+              background:#ddd !important;
+              border-radius:999px !important;
+              overflow:hidden !important;
+            ">
+              <div style="
+                display:block !important;
+                width:${section.percentage}% !important;
+                height:100% !important;
+                background:#5b922b !important;
+              "></div>
             </div>
-            <div class="section-performance-small">
-              Wrong: ${section.wrong} &nbsp; | &nbsp; Unanswered: ${section.unanswered}
+
+            <div style="
+              margin-top:7px !important;
+              font-size:12px !important;
+              color:#555 !important;
+            ">
+              Wrong: ${section.wrong}
+              &nbsp; | &nbsp;
+              Unanswered: ${section.unanswered}
             </div>
           </div>
         `).join("")}
       </div>
-    </section>
+    </div>
   `;
 }
 
@@ -965,6 +1053,10 @@ function submitTest(){
 
   const sectionBox = document.getElementById("sectionPercentText");
   if(sectionBox){
+    sectionBox.style.setProperty("display", "block", "important");
+    sectionBox.style.setProperty("visibility", "visible", "important");
+    sectionBox.style.setProperty("opacity", "1", "important");
+    sectionBox.style.setProperty("width", "100%", "important");
     sectionBox.innerHTML = getSectionWisePercentHtml();
   }
 
