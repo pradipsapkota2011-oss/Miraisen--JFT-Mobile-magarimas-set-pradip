@@ -729,6 +729,216 @@ function makePalette(){
   }
 }
 
+
+// =========================================================
+// SECTION-WISE RESULT
+// Uses the same section boundaries as the live test navigation.
+// Double questions count each part separately.
+// =========================================================
+function getSectionDefinitions(){
+  return [
+    { name: "Script & Vocabulary", start: 0, end: 16 },
+    { name: "Conversation & Expression", start: 16, end: 28 },
+    { name: "Listening", start: 28, end: 37 },
+    { name: "Reading", start: 37, end: questions.length }
+  ];
+}
+
+function getSectionWiseStats(){
+  return getSectionDefinitions().map(section => {
+    let correct = 0;
+    let wrong = 0;
+    let unanswered = 0;
+    let total = 0;
+
+    const safeEnd = Math.min(section.end, questions.length);
+
+    for(let index = section.start; index < safeEnd; index++){
+      const q = questions[index];
+      if(!q) continue;
+
+      if(q.type === "double" && Array.isArray(q.parts)){
+        q.parts.forEach((part, partIndex) => {
+          total++;
+
+          const selected =
+            userAnswers[index] &&
+            userAnswers[index][partIndex] !== undefined
+              ? userAnswers[index][partIndex]
+              : undefined;
+
+          if(selected === undefined || selected === null){
+            unanswered++;
+          }else if(selected === part.answer){
+            correct++;
+          }else{
+            wrong++;
+          }
+        });
+      }else{
+        total++;
+        const selected = userAnswers[index];
+
+        if(selected === undefined || selected === null){
+          unanswered++;
+        }else if(selected === q.answer){
+          correct++;
+        }else{
+          wrong++;
+        }
+      }
+    }
+
+    const percentage =
+      total > 0
+        ? Math.round((correct / total) * 100)
+        : 0;
+
+    return {
+      ...section,
+      correct,
+      wrong,
+      unanswered,
+      total,
+      percentage
+    };
+  });
+}
+
+function getSectionWisePercentHtml(){
+  const stats = getSectionWiseStats();
+
+  let html = `
+    <div style="
+      margin:24px 0 22px;
+      padding-top:18px;
+      border-top:1px solid #d8d8d8;
+    ">
+      <div style="
+        font-size:20px;
+        line-height:1.3;
+        font-weight:800;
+        margin-bottom:12px;
+        color:#111;
+      ">
+        Section-wise Performance
+      </div>
+
+      <div style="
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+        gap:12px;
+        width:100%;
+      ">
+  `;
+
+  stats.forEach(section => {
+    html += `
+      <div style="
+        background:#f7f7f7;
+        border:1px solid #ddd;
+        border-radius:10px;
+        padding:13px;
+        min-width:0;
+      ">
+        <div style="
+          font-size:15px;
+          line-height:1.35;
+          font-weight:800;
+          margin-bottom:7px;
+        ">
+          ${section.name}
+        </div>
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          gap:10px;
+          align-items:center;
+          font-size:14px;
+          margin-bottom:8px;
+        ">
+          <span>${section.correct} / ${section.total} correct</span>
+          <strong style="font-size:18px;">${section.percentage}%</strong>
+        </div>
+
+        <div style="
+          width:100%;
+          height:9px;
+          background:#ddd;
+          border-radius:999px;
+          overflow:hidden;
+        ">
+          <div style="
+            width:${section.percentage}%;
+            height:100%;
+            background:#5b922b;
+            border-radius:999px;
+          "></div>
+        </div>
+
+        <div style="
+          margin-top:8px;
+          color:#555;
+          font-size:12px;
+          line-height:1.4;
+        ">
+          Wrong: ${section.wrong}
+          &nbsp; | &nbsp;
+          Unanswered: ${section.unanswered}
+        </div>
+      </div>
+    `;
+  });
+
+  html += `
+      </div>
+    </div>
+  `;
+
+  return html;
+}
+
+function getSectionWiseFeedbackSummaryHtml(){
+  const stats = getSectionWiseStats();
+
+  return `
+    <div style="
+      padding:12px;
+      background:#fff;
+      border-bottom:1px solid #ddd;
+    ">
+      <div style="
+        font-size:14px;
+        font-weight:800;
+        margin-bottom:9px;
+      ">
+        Section-wise Performance
+      </div>
+
+      <div style="
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+      ">
+        ${stats.map(section => `
+          <span style="
+            display:inline-block;
+            background:#f3f3f3;
+            border:1px solid #ddd;
+            border-radius:6px;
+            padding:7px 10px;
+            font-weight:700;
+            font-size:13px;
+          ">
+            ${section.name}: ${section.correct}/${section.total} (${section.percentage}%)
+          </span>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
 async function submitTest(){
   if(submitted) return;
   closeSubmitConfirm();
@@ -807,6 +1017,11 @@ async function submitTest(){
        <span style="font-size:30px;font-weight:bold;color:${status === "PASS" ? "green" : "red"}">
          ${status}
        </span>`;
+
+    const sectionPercentText = document.getElementById("sectionPercentText");
+    if(sectionPercentText){
+      sectionPercentText.innerHTML = getSectionWisePercentHtml();
+    }
 
     if(timerIntervalId){
       clearInterval(timerIntervalId);
@@ -1650,6 +1865,9 @@ function showTestFeedbackPage(){
         <div class="feedback-score-summary">
           ${getFeedbackScoreSummaryHtml()}
         </div>
+
+        ${getSectionWiseFeedbackSummaryHtml()}
+
         <div class="feedback-note">
           Showing all ${totalFeedbackRows} question items. Double questions are shown separately as (a) and (b).
         </div>
