@@ -1150,106 +1150,405 @@ body.exam-security-paused #examWatermark{
   }
 }
 
-
 /* =========================================================
-   SET 5 FINAL DISPLAY REPAIR — 2026-08-15
-   Fixes:
-   1) identity watermark appearing as normal text at page bottom
-   2) mobile answer options not visible
-   3) footer overlapping mobile answers
+   FINAL 3-FIX PATCH
+   1) result + section percentages scroll
+   2) section Finish/Next Yes-No modal
+   3) English question above Japanese question
    ========================================================= */
 
-/* Watermark must always stay OUTSIDE normal document flow. */
-#examWatermark{
-  display:none !important;
-  position:fixed !important;
-  top:-14vh !important;
-  left:-10vw !important;
-  right:auto !important;
-  bottom:auto !important;
-  width:120vw !important;
-  height:128vh !important;
-  min-width:120vw !important;
-  min-height:128vh !important;
-  margin:0 !important;
-  padding:45px !important;
-  box-sizing:border-box !important;
-  z-index:42000 !important;
-  pointer-events:none !important;
-  overflow:hidden !important;
-  opacity:.075 !important;
-  transform:rotate(-22deg) !important;
-  transform-origin:center center !important;
-  align-content:center !important;
-  justify-content:center !important;
-  grid-template-columns:repeat(3,minmax(220px,1fr)) !important;
-  gap:58px 34px !important;
-  font-family:Arial,Helvetica,sans-serif !important;
-  font-size:14px !important;
-  line-height:1.25 !important;
-  font-weight:800 !important;
-  color:#111 !important;
+#appShell{
+  width:100%;
+  height:100%;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
 }
 
-body.exam-security-active #examWatermark{
-  display:grid !important;
-}
-
-#examWatermark span{
+/* ---------- bilingual question ---------- */
+.bilingual-question{
   display:block !important;
-  position:static !important;
-  width:auto !important;
+}
+
+.question-english{
+  display:block;
+  font-size:18px;
+  line-height:1.5;
+  font-weight:500;
+  color:#222;
+  margin-bottom:7px;
+}
+
+.question-japanese{
+  display:block;
+  font-size:22px;
+  line-height:1.55;
+  font-weight:600;
+  color:#111;
+  margin-top:2px;
+}
+
+.part-title-english{
+  font-size:16px;
+  line-height:1.45;
+  margin-bottom:5px;
+  font-weight:600;
+}
+
+.part-title-japanese{
+  font-size:19px;
+  line-height:1.55;
+  font-weight:700;
+}
+
+/* ---------- section yes/no modal ---------- */
+.section-confirm-overlay{
+  position:fixed;
+  inset:0;
+  z-index:999999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(0,0,0,.58);
+}
+
+.section-confirm-card{
+  width:min(440px,94vw);
+  background:#fff;
+  border-radius:13px;
+  padding:26px 22px;
+  text-align:center;
+  box-shadow:0 12px 40px rgba(0,0,0,.35);
+}
+
+.section-confirm-title{
+  font-size:21px;
+  font-weight:800;
+  margin-bottom:12px;
+}
+
+.section-confirm-card p{
+  font-size:16px;
+  line-height:1.55;
+  margin:8px 0;
+}
+
+.section-confirm-actions{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-top:20px;
+}
+
+.section-confirm-actions .confirmYes,
+.section-confirm-actions .confirmNo{
+  min-width:110px;
+  margin:0;
+}
+
+/* ---------- result + percentage ---------- */
+html.result-mode,
+body.result-mode{
   height:auto !important;
-  margin:0 !important;
-  padding:0 !important;
-  white-space:nowrap !important;
-  text-align:center !important;
+  min-height:100% !important;
+  max-height:none !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch !important;
 }
 
-/* Security overlay must also never consume normal page space. */
-#examSecurityOverlay{
-  position:fixed !important;
-  inset:0 !important;
-  width:100vw !important;
-  height:100dvh !important;
-  margin:0 !important;
-  z-index:999999 !important;
+body.result-mode #appShell{
+  height:auto !important;
+  min-height:100vh !important;
+  max-height:none !important;
+  overflow:visible !important;
+  display:block !important;
 }
 
-/* =========================================================
-   MOBILE: question area scrolls; footer stays visible.
-   ========================================================= */
-@media (max-width:900px){
+#resultPage{
+  width:100% !important;
+  height:auto !important;
+  min-height:100vh !important;
+  max-height:none !important;
+  overflow:visible !important;
+  background:#fff;
+}
 
-  html,
-  body{
+.resultBody{
+  height:auto !important;
+  max-height:none !important;
+  overflow:visible !important;
+  padding:40px 30px 90px;
+}
+
+.resultFinishBtn{
+  margin-top:8px;
+  padding:12px 25px;
+  border:0;
+  border-radius:7px;
+  background:#5b922b;
+  color:#fff;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.section-performance{
+  margin:24px 0 20px;
+  padding-top:18px;
+  border-top:1px solid #ddd;
+}
+
+.section-performance h2{
+  font-size:20px;
+  margin:0 0 13px;
+}
+
+.section-performance-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:12px;
+}
+
+.section-performance-card{
+  background:#f7f7f7;
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:13px;
+}
+
+.section-performance-title{
+  font-size:15px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.section-performance-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  font-size:14px;
+  margin-bottom:8px;
+}
+
+.section-performance-row strong{
+  font-size:18px;
+}
+
+.section-performance-bar{
+  height:9px;
+  background:#ddd;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.section-performance-fill{
+  height:100%;
+  background:#5b922b;
+}
+
+.section-performance-small{
+  margin-top:8px;
+  font-size:12px;
+  color:#555;
+}
+
+/* ---------- full feedback ---------- */
+html.feedback-mode,
+body.feedback-mode{
+  height:auto !important;
+  min-height:100% !important;
+  max-height:none !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+}
+
+#feedbackPage{
+  min-height:100vh;
+  background:#f4f4f4;
+}
+
+.feedback-top{
+  position:sticky;
+  top:0;
+  z-index:40;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 15px;
+  background:#000;
+  color:#fff;
+}
+
+.feedback-top h2{
+  margin:0;
+  font-size:18px;
+}
+
+.exit-test-btn{
+  padding:9px 16px;
+  border:0;
+  border-radius:5px;
+  background:#ffdc95;
+  font-weight:700;
+}
+
+.feedback-green-line{
+  height:17px;
+  background:#5b922b;
+}
+
+.feedback-box{
+  width:94%;
+  margin:15px auto 35px;
+  background:#fff;
+  border:1px solid #ccc;
+  border-radius:10px 10px 0 0;
+  overflow:visible;
+}
+
+.feedback-title{
+  padding:12px;
+  background:#000;
+  color:#fff;
+  font-weight:700;
+  border-radius:9px 9px 0 0;
+}
+
+.feedback-section-summary{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  padding:12px;
+}
+
+.feedback-section-summary span{
+  padding:7px 9px;
+  border:1px solid #ddd;
+  border-radius:6px;
+  background:#f3f3f3;
+  font-size:13px;
+  font-weight:700;
+}
+
+.feedback-table-wrap{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+.feedback-table{
+  width:100%;
+  min-width:760px;
+  border-collapse:collapse;
+}
+
+.feedback-table th,
+.feedback-table td{
+  border:1px solid #ddd;
+  padding:10px 8px;
+  font-size:13px;
+  line-height:1.4;
+}
+
+.feedback-table th{
+  background:#efefef;
+}
+
+.feedback-no-cell,
+.feedback-result-cell{
+  text-align:center;
+  font-weight:700;
+}
+
+.feedback-result-cell{
+  font-size:21px !important;
+}
+
+.correct-mark{color:green;}
+.wrong-mark{color:blue;}
+
+.feedback-answer-img{
+  width:85px;
+  max-height:75px;
+  object-fit:contain;
+  display:block;
+  margin:auto;
+}
+
+.feedback-unanswered{
+  font-weight:700;
+}
+
+/* ---------- mobile exam ---------- */
+@media(max-width:900px){
+  html:not(.result-mode):not(.feedback-mode),
+  body:not(.result-mode):not(.feedback-mode){
     width:100% !important;
     height:100% !important;
-    min-height:100% !important;
-    margin:0 !important;
     overflow:hidden !important;
   }
 
-  #appShell:not(.auth-hidden){
-    width:100% !important;
+  body:not(.result-mode):not(.feedback-mode) #appShell{
     height:100vh !important;
     height:100dvh !important;
-    min-height:0 !important;
     max-height:100dvh !important;
-    display:flex !important;
-    flex-direction:column !important;
+    min-height:0 !important;
     overflow:hidden !important;
   }
 
-  #appShell .top,
-  #appShell .green,
-  #appShell .sections,
-  #appShell .palette,
-  #appShell .footer{
+  .top,
+  .green,
+  .footer{
     flex:0 0 auto !important;
   }
 
-  #appShell .main{
+  .top{
+    min-height:72px !important;
+    height:auto !important;
+    display:grid !important;
+    grid-template-columns:1fr auto !important;
+    grid-template-rows:auto auto !important;
+    gap:3px 8px !important;
+    padding:7px 9px !important;
+  }
+
+  #questionInfo{
+    grid-column:1 !important;
+    grid-row:1 !important;
+    font-size:11px !important;
+  }
+
+  .timer{
+    grid-column:1 !important;
+    grid-row:2 !important;
+    text-align:left !important;
+    font-size:11px !important;
+  }
+
+  #time{
+    font-size:15px !important;
+  }
+
+  .finish{
+    grid-column:2 !important;
+    grid-row:1 / span 2 !important;
+    align-self:center !important;
+    padding:9px 10px !important;
+    font-size:12px !important;
+  }
+
+  .green{
+    height:auto !important;
+    min-height:24px !important;
+    flex-wrap:wrap !important;
+    padding:3px 6px !important;
+    font-size:9px !important;
+  }
+
+  .main{
     flex:1 1 0 !important;
     min-height:0 !important;
     height:0 !important;
@@ -1258,7 +1557,51 @@ body.exam-security-active #examWatermark{
     overflow:hidden !important;
   }
 
-  #appShell .content{
+  .sections{
+    flex:0 0 auto !important;
+    display:flex !important;
+    width:100% !important;
+    overflow-x:auto !important;
+    border-right:0 !important;
+    border-bottom:1px solid #ccc !important;
+  }
+
+  .sec{
+    flex:0 0 120px !important;
+    min-width:120px !important;
+    height:52px !important;
+    display:flex !important;
+    justify-content:center !important;
+    align-items:center !important;
+    padding:5px !important;
+    border-right:1px solid #ddd !important;
+    border-bottom:0 !important;
+  }
+
+  .sec:before{
+    display:none !important;
+  }
+
+  .palette{
+    flex:0 0 auto !important;
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    width:100% !important;
+    overflow-x:auto !important;
+    gap:6px !important;
+    padding:7px !important;
+    border-bottom:1px solid #ddd;
+  }
+
+  .qbtn{
+    flex:0 0 34px !important;
+    width:34px !important;
+    height:28px !important;
+    line-height:28px !important;
+    margin:0 !important;
+  }
+
+  .content{
     flex:1 1 0 !important;
     min-height:0 !important;
     height:0 !important;
@@ -1267,113 +1610,602 @@ body.exam-security-active #examWatermark{
     overflow-x:hidden !important;
     -webkit-overflow-scrolling:touch !important;
     touch-action:pan-y !important;
-    overscroll-behavior-y:contain !important;
-    padding-bottom:90px !important;
+    padding:12px 15px 80px !important;
   }
 
-  /* Normal text answers: always vertical and visible. */
-  #appShell #optionContainer:not(.imageOptions){
+  .inst{
+    width:100% !important;
+  }
+
+  .image{
+    width:100% !important;
+    margin:10px auto !important;
+  }
+
+  #questionImage{
+    display:block !important;
+    max-width:90% !important;
+    max-height:240px !important;
+    width:auto !important;
+    height:auto !important;
+    object-fit:contain !important;
+    margin:auto !important;
+  }
+
+  #optionContainer:not(.imageOptions){
+    width:100% !important;
     display:flex !important;
     flex-direction:column !important;
-    align-items:stretch !important;
-    width:100% !important;
-    max-width:100% !important;
-    margin:8px 0 0 !important;
-    padding:0 0 35px !important;
     gap:8px !important;
-    overflow:visible !important;
+    margin:8px 0 0 !important;
+    padding:0 0 30px !important;
   }
 
-  #appShell #optionContainer:not(.imageOptions) .option{
-    display:flex !important;
+  #optionContainer:not(.imageOptions) .option{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
     flex:0 0 auto !important;
-    width:100% !important;
-    max-width:100% !important;
-    min-width:0 !important;
+    margin:0 !important;
     min-height:48px !important;
-    margin:0 !important;
     padding:10px 14px !important;
-    justify-content:flex-start !important;
-    align-items:center !important;
     font-size:16px !important;
-    line-height:1.35 !important;
-    text-align:left !important;
+  }
+
+  .footer{
     position:relative !important;
-    z-index:2 !important;
-    pointer-events:auto !important;
-    touch-action:manipulation !important;
-  }
-
-  /* Image answers remain tappable. */
-  #appShell #optionContainer.imageOptions{
-    width:100% !important;
-    max-width:100% !important;
-    display:flex !important;
-    flex-wrap:wrap !important;
-    gap:10px !important;
-    overflow:visible !important;
-  }
-
-  #appShell #optionContainer.imageOptions .imageOption{
-    width:calc(50% - 5px) !important;
-    min-width:0 !important;
-    max-width:none !important;
-    height:135px !important;
-    min-height:135px !important;
-    margin:0 !important;
-    padding:7px !important;
-    pointer-events:auto !important;
-    touch-action:manipulation !important;
-  }
-
-  #appShell #optionContainer.imageOptions .imageOption img{
-    width:100% !important;
-    height:110px !important;
-    max-width:100% !important;
-    max-height:110px !important;
-    object-fit:contain !important;
-  }
-
-  /* Footer participates in flex layout; never covers options. */
-  #appShell .footer{
-    position:relative !important;
-    left:auto !important;
-    right:auto !important;
     bottom:auto !important;
     width:100% !important;
     height:52px !important;
     min-height:52px !important;
     flex-basis:52px !important;
     z-index:100 !important;
-    padding-bottom:max(5px,env(safe-area-inset-bottom)) !important;
   }
 }
 
-@media (max-width:600px){
-
-  #appShell .content{
-    padding:9px 10px 100px !important;
+@media(max-width:600px){
+  .question-english{
+    font-size:15px;
   }
 
-  #appShell .image{
-    width:100% !important;
-    margin:7px auto 10px !important;
-    text-align:center !important;
+  .question-japanese{
+    font-size:18px;
   }
 
-  #appShell #questionImage{
+  .part-title-english{
+    font-size:14px;
+  }
+
+  .part-title-japanese{
+    font-size:17px;
+  }
+
+  .resultBody{
+    padding:28px 24px 100px !important;
+  }
+
+  .section-performance-grid{
+    grid-template-columns:1fr;
+  }
+
+  .section-confirm-card{
+    padding:22px 17px;
+  }
+
+  .section-confirm-actions{
+    gap:10px;
+  }
+}
+
+
+/* =========================================================
+   FINAL QUESTION STACK FIX — 2026-08-15
+   English prompt first, Japanese question directly below.
+   Overrides the old mobile rule that made .inst a horizontal flex row.
+   ========================================================= */
+
+.inst{
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+}
+
+.inst > .instruction,
+.inst > .subtitle,
+.inst > .mainQuestion,
+.inst > .bilingual-question{
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+  float:none !important;
+  clear:both !important;
+}
+
+.inst .instruction{
+  margin:0 0 6px 0 !important;
+}
+
+.inst .subtitle{
+  margin:0 0 9px 0 !important;
+}
+
+.inst .mainQuestion,
+.inst .bilingual-question{
+  margin:7px 0 0 0 !important;
+}
+
+/* Bilingual question: English above Japanese */
+.bilingual-question{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:7px !important;
+}
+
+.question-english,
+.question-japanese{
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+}
+
+.question-english{
+  order:1 !important;
+}
+
+.question-japanese{
+  order:2 !important;
+}
+
+/* Old rule at max-width:800px sets .inst to display:flex.
+   Override it explicitly for tablet and phone. */
+@media(max-width:900px){
+  .inst{
     display:block !important;
-    width:auto !important;
-    height:auto !important;
-    max-width:88% !important;
-    max-height:210px !important;
-    object-fit:contain !important;
-    margin:0 auto !important;
+    flex-direction:column !important;
+    justify-content:flex-start !important;
+    align-items:stretch !important;
   }
 
-  #examWatermark{
-    grid-template-columns:repeat(2,minmax(170px,1fr)) !important;
-    gap:44px 18px !important;
-    font-size:10px !important;
+  .inst > *{
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  .instruction{
+    display:block !important;
+    margin:0 0 5px 0 !important;
+  }
+
+  .subtitle{
+    display:block !important;
+    margin:0 0 8px 0 !important;
+  }
+
+  .mainQuestion{
+    display:block !important;
+    margin:6px 0 0 0 !important;
+  }
+}
+
+@media(max-width:600px){
+  .inst{
+    padding:11px 13px !important;
+  }
+
+  .inst .instruction{
+    font-size:15px !important;
+    line-height:1.45 !important;
+  }
+
+  .inst .subtitle{
+    font-size:14px !important;
+    line-height:1.4 !important;
+  }
+
+  .inst .mainQuestion{
+    font-size:18px !important;
+    line-height:1.55 !important;
+  }
+
+  .question-english{
+    font-size:15px !important;
+    line-height:1.45 !important;
+  }
+
+  .question-japanese{
+    font-size:18px !important;
+    line-height:1.55 !important;
+  }
+}
+
+
+/* =========================================================
+   FINAL SUBMIT CONFIRM MODAL FIX — 2026-08-15
+   Keeps BOTH Yes and No buttons fully visible on phones.
+   ========================================================= */
+
+#submitConfirmBox{
+  position:fixed !important;
+  top:50% !important;
+  left:50% !important;
+  transform:translate(-50%, -50%) !important;
+
+  width:min(430px, calc(100vw - 24px)) !important;
+  max-width:calc(100vw - 24px) !important;
+  min-width:0 !important;
+
+  max-height:calc(100dvh - 32px) !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+
+  margin:0 !important;
+  box-sizing:border-box !important;
+  z-index:999999 !important;
+
+  background:#fff !important;
+  border:2px solid #111 !important;
+  border-radius:8px !important;
+}
+
+#submitConfirmBox .modal-head{
+  width:100% !important;
+  box-sizing:border-box !important;
+  padding:9px 12px !important;
+}
+
+#submitConfirmBox .result-content{
+  width:100% !important;
+  box-sizing:border-box !important;
+  padding:22px 18px !important;
+  text-align:center !important;
+  line-height:1.4 !important;
+}
+
+#submitConfirmBox .result-content h2{
+  width:100% !important;
+  margin:0 0 20px !important;
+  padding:0 !important;
+  font-size:21px !important;
+  line-height:1.35 !important;
+  text-align:center !important;
+  color:#4f861d !important;
+  overflow-wrap:anywhere !important;
+}
+
+/* Both buttons remain inside the modal. */
+#submitConfirmBox .confirmYes,
+#submitConfirmBox .confirmNo{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  width:120px !important;
+  min-width:120px !important;
+  max-width:calc(50% - 8px) !important;
+
+  min-height:44px !important;
+  margin:0 5px !important;
+  padding:10px 16px !important;
+
+  box-sizing:border-box !important;
+  font-size:16px !important;
+  font-weight:700 !important;
+  border-radius:6px !important;
+  cursor:pointer !important;
+}
+
+#submitConfirmBox .confirmYes{
+  background:#5b922b !important;
+  color:#fff !important;
+}
+
+#submitConfirmBox .confirmNo{
+  background:#ddd !important;
+  color:#111 !important;
+}
+
+@media(max-width:600px){
+  #submitConfirmBox{
+    width:calc(100vw - 20px) !important;
+    max-width:calc(100vw - 20px) !important;
+  }
+
+  #submitConfirmBox .result-content{
+    padding:20px 14px !important;
+  }
+
+  #submitConfirmBox .result-content h2{
+    font-size:19px !important;
+    margin-bottom:18px !important;
+  }
+
+  #submitConfirmBox .confirmYes,
+  #submitConfirmBox .confirmNo{
+    width:calc(50% - 12px) !important;
+    min-width:0 !important;
+    max-width:none !important;
+    margin:0 4px !important;
+    padding:10px 8px !important;
+  }
+}
+
+
+/* =========================================================
+   FINAL PROTECTIVE MOBILE OVERRIDE
+   ========================================================= */
+@media(max-width:900px){
+  body:not(.result-mode):not(.feedback-mode) #appShell{
+    display:flex !important;
+    flex-direction:column !important;
+    height:100dvh !important;
+    max-height:100dvh !important;
+    overflow:hidden !important;
+  }
+
+  .main{
+    flex:1 1 0 !important;
+    min-height:0 !important;
+    height:0 !important;
+    overflow:hidden !important;
+  }
+
+  .content{
+    flex:1 1 0 !important;
+    min-height:0 !important;
+    height:0 !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch !important;
+    padding-bottom:85px !important;
+  }
+
+  #optionContainer:not(.imageOptions){
+    display:flex !important;
+    flex-direction:column !important;
+    width:100% !important;
+    gap:8px !important;
+  }
+
+  #optionContainer:not(.imageOptions) .option{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    flex:0 0 auto !important;
+  }
+
+  .footer{
+    position:relative !important;
+    left:auto !important;
+    right:auto !important;
+    bottom:auto !important;
+    flex:0 0 52px !important;
+    height:52px !important;
+    min-height:52px !important;
+    width:100% !important;
+    z-index:100 !important;
+  }
+}
+
+
+/* =========================================================
+   FINAL YOUR LANGUAGE MODAL FIX
+   - full modal visible on mobile
+   - X close button always visible
+   - modal content scrolls if needed
+   ========================================================= */
+
+#langModal1{
+  position:fixed !important;
+  top:50% !important;
+  left:50% !important;
+  right:auto !important;
+  bottom:auto !important;
+
+  transform:translate(-50%, -50%) !important;
+
+  width:min(560px, calc(100vw - 24px)) !important;
+  max-width:calc(100vw - 24px) !important;
+  min-width:0 !important;
+
+  max-height:calc(100dvh - 32px) !important;
+
+  margin:0 !important;
+  padding:0 !important;
+
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+
+  background:#fff !important;
+  border:2px solid #111 !important;
+  border-radius:9px !important;
+
+  box-sizing:border-box !important;
+  z-index:999999 !important;
+
+  -webkit-overflow-scrolling:touch !important;
+}
+
+/* Keep title + X visible while modal content scrolls */
+#langModal1 .modal-head{
+  position:sticky !important;
+  top:0 !important;
+  z-index:10 !important;
+
+  width:100% !important;
+  min-height:42px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+
+  margin:0 !important;
+  padding:10px 12px !important;
+
+  box-sizing:border-box !important;
+
+  background:#050505 !important;
+  color:#fff !important;
+
+  font-size:16px !important;
+  font-weight:700 !important;
+}
+
+/* X close button */
+#langModal1 .close{
+  float:none !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  flex:0 0 34px !important;
+  width:34px !important;
+  height:34px !important;
+
+  margin-left:12px !important;
+  padding:0 !important;
+
+  border-radius:50% !important;
+
+  color:#fff !important;
+  background:#333 !important;
+
+  font-size:25px !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+
+  cursor:pointer !important;
+  user-select:none !important;
+  touch-action:manipulation !important;
+}
+
+/* Translation table */
+#langModal1 table{
+  width:100% !important;
+  max-width:100% !important;
+
+  margin:0 !important;
+  border-collapse:collapse !important;
+  table-layout:fixed !important;
+
+  background:#fff !important;
+}
+
+#langModal1 td{
+  border:1px solid #bbb !important;
+  padding:12px !important;
+
+  vertical-align:top !important;
+
+  font-size:15px !important;
+  line-height:1.55 !important;
+
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:normal !important;
+}
+
+#langModal1 td:first-child{
+  width:82px !important;
+  font-weight:700 !important;
+  background:#f5f5f5 !important;
+}
+
+@media(max-width:600px){
+
+  #langModal1{
+    width:calc(100vw - 16px) !important;
+    max-width:calc(100vw - 16px) !important;
+
+    max-height:calc(100dvh - 20px) !important;
+  }
+
+  #langModal1 .modal-head{
+    min-height:44px !important;
+    padding:8px 10px !important;
+    font-size:15px !important;
+  }
+
+  #langModal1 .close{
+    flex-basis:32px !important;
+    width:32px !important;
+    height:32px !important;
+    font-size:23px !important;
+  }
+
+  #langModal1 td{
+    padding:10px 8px !important;
+    font-size:14px !important;
+    line-height:1.5 !important;
+  }
+
+  #langModal1 td:first-child{
+    width:72px !important;
+  }
+}
+
+
+/* =========================================================
+   KAWAI / KUDAMONO STYLE FINAL PROTECTIVE OVERRIDE
+   ========================================================= */
+@media(max-width:900px){
+
+  body:not(.result-mode):not(.feedback-mode) #appShell{
+    display:flex !important;
+    flex-direction:column !important;
+    width:100% !important;
+    height:100dvh !important;
+    min-height:0 !important;
+    max-height:100dvh !important;
+    overflow:hidden !important;
+  }
+
+  body:not(.result-mode):not(.feedback-mode) .main{
+    flex:1 1 0 !important;
+    min-height:0 !important;
+    height:0 !important;
+    overflow:hidden !important;
+  }
+
+  body:not(.result-mode):not(.feedback-mode) .content{
+    flex:1 1 0 !important;
+    min-height:0 !important;
+    height:0 !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch !important;
+    touch-action:pan-y !important;
+    padding-bottom:85px !important;
+  }
+
+  #optionContainer:not(.imageOptions){
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    width:100% !important;
+    max-width:100% !important;
+    gap:8px !important;
+  }
+
+  #optionContainer:not(.imageOptions) .option{
+    flex:0 0 auto !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+  }
+
+  .footer{
+    position:relative !important;
+    left:auto !important;
+    right:auto !important;
+    bottom:auto !important;
+    flex:0 0 52px !important;
+    width:100% !important;
+    height:52px !important;
+    min-height:52px !important;
+    z-index:100 !important;
   }
 }
