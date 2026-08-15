@@ -604,7 +604,56 @@ function loadQuestion(){
     html += mobileBilingualQuestionHtml(q, q.question, "instruction");
   }
 
-  document.getElementById("questionText").innerHTML = html;
+  const questionTextBox = document.getElementById("questionText");
+
+  // =========================================================
+  // FINAL MOBILE LAYOUT FIX — ONLY Q8 TO Q16
+  // Keep all existing question logic.
+  // On mobile/tablet, force every text line to stack vertically:
+  // English first -> Japanese directly underneath.
+  // =========================================================
+  const stackQ8To16 =
+    isMobileExamView() &&
+    currentQuestion >= 7 &&
+    currentQuestion <= 15;
+
+  if(stackQ8To16){
+    questionTextBox.style.setProperty("display", "block", "important");
+    questionTextBox.style.setProperty("width", "100%", "important");
+    questionTextBox.style.setProperty("max-width", "100%", "important");
+    questionTextBox.style.setProperty("flex-direction", "column", "important");
+    questionTextBox.style.setProperty("align-items", "stretch", "important");
+    questionTextBox.style.setProperty("justify-content", "flex-start", "important");
+  }else{
+    questionTextBox.style.removeProperty("display");
+    questionTextBox.style.removeProperty("width");
+    questionTextBox.style.removeProperty("max-width");
+    questionTextBox.style.removeProperty("flex-direction");
+    questionTextBox.style.removeProperty("align-items");
+    questionTextBox.style.removeProperty("justify-content");
+  }
+
+  questionTextBox.innerHTML = html;
+
+  // Some mobile CSS rules may give instruction/subtitle/question a fixed
+  // width or flex layout. Override those rules only for Q8-Q16.
+  if(stackQ8To16){
+    Array.from(questionTextBox.children).forEach((child, index) => {
+      child.style.setProperty("display", "block", "important");
+      child.style.setProperty("width", "100%", "important");
+      child.style.setProperty("max-width", "100%", "important");
+      child.style.setProperty("flex", "none", "important");
+      child.style.setProperty("float", "none", "important");
+      child.style.setProperty("clear", "both", "important");
+      child.style.setProperty("box-sizing", "border-box", "important");
+      child.style.setProperty("text-align", "left", "important");
+
+      // Keep a small clean gap between each line/block.
+      if(index === 0){
+        child.style.setProperty("margin-top", "0", "important");
+      }
+    });
+  }
 
   const imgBox = document.querySelector(".image");
   const img = document.getElementById("questionImage");
