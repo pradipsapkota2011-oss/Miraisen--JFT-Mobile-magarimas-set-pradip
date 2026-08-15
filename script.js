@@ -590,70 +590,41 @@ function loadQuestion(){
     html += `<div class="subtitle">${q.subtitle}</div>`;
   }
 
-  // Normal question:
-  // Mobile = English first + Japanese below.
-  // Desktop = existing question display.
+  // FINAL DISPLAY:
+  // English instruction/subtitle stays above.
+  // The original Japanese question is shown below.
+  // Do NOT translate the Japanese question into English here.
   if(q.question && q.type !== "dialog" && q.type !== "double"){
-    html += mobileBilingualQuestionHtml(q, q.question, "mainQuestion");
+    html += `<div class="mainQuestion">${q.question}</div>`;
   }
 
-  // Double question main prompt:
-  // Mobile = English first + Japanese below when both are available.
-  // Desktop = existing prompt.
+  // Double question main prompt stays exactly as written in questions.js.
   if(q.type === "double" && q.question){
-    html += mobileBilingualQuestionHtml(q, q.question, "instruction");
+    html += `<div class="instruction">${q.question}</div>`;
   }
 
   const questionTextBox = document.getElementById("questionText");
 
-  // =========================================================
-  // FINAL MOBILE LAYOUT FIX — ONLY Q8 TO Q16
-  // Keep all existing question logic.
-  // On mobile/tablet, force every text line to stack vertically:
-  // English first -> Japanese directly underneath.
-  // =========================================================
-  const stackQ8To16 =
-    isMobileExamView() &&
-    currentQuestion >= 7 &&
-    currentQuestion <= 15;
-
-  if(stackQ8To16){
+  // Mobile layout: keep English instruction/subtitle above the original Japanese question.
+  if(window.matchMedia("(max-width: 900px)").matches){
     questionTextBox.style.setProperty("display", "block", "important");
     questionTextBox.style.setProperty("width", "100%", "important");
-    questionTextBox.style.setProperty("max-width", "100%", "important");
-    questionTextBox.style.setProperty("flex-direction", "column", "important");
-    questionTextBox.style.setProperty("align-items", "stretch", "important");
-    questionTextBox.style.setProperty("justify-content", "flex-start", "important");
-  }else{
-    questionTextBox.style.removeProperty("display");
-    questionTextBox.style.removeProperty("width");
-    questionTextBox.style.removeProperty("max-width");
-    questionTextBox.style.removeProperty("flex-direction");
-    questionTextBox.style.removeProperty("align-items");
-    questionTextBox.style.removeProperty("justify-content");
   }
 
   questionTextBox.innerHTML = html;
 
-  // Some mobile CSS rules may give instruction/subtitle/question a fixed
-  // width or flex layout. Override those rules only for Q8-Q16.
-  if(stackQ8To16){
-    Array.from(questionTextBox.children).forEach((child, index) => {
+  if(window.matchMedia("(max-width: 900px)").matches){
+    Array.from(questionTextBox.children).forEach(child => {
       child.style.setProperty("display", "block", "important");
       child.style.setProperty("width", "100%", "important");
       child.style.setProperty("max-width", "100%", "important");
       child.style.setProperty("flex", "none", "important");
       child.style.setProperty("float", "none", "important");
       child.style.setProperty("clear", "both", "important");
-      child.style.setProperty("box-sizing", "border-box", "important");
       child.style.setProperty("text-align", "left", "important");
-
-      // Keep a small clean gap between each line/block.
-      if(index === 0){
-        child.style.setProperty("margin-top", "0", "important");
-      }
     });
   }
+
 
   const imgBox = document.querySelector(".image");
   const img = document.getElementById("questionImage");
@@ -787,38 +758,13 @@ function loadDialogQuestion(q){
   const dialogWrap = document.createElement("div");
   dialogWrap.className = "dialogWrap";
 
-  const dialogTextGroup = document.createElement("div");
-  dialogTextGroup.style.flex = "1 1 auto";
-  dialogTextGroup.style.minWidth = "0";
-  dialogTextGroup.style.width = "100%";
-
-  const savedDialogText = getSet5MobileText(q);
-
-  if(isMobileExamView() && savedDialogText && savedDialogText.englishQuestion){
-    const englishDialog = document.createElement("div");
-    englishDialog.className = "mobileEnglishQuestion";
-    englishDialog.innerHTML = savedDialogText.englishQuestion;
-    englishDialog.style.fontSize = "17px";
-    englishDialog.style.lineHeight = "1.45";
-    englishDialog.style.fontWeight = "700";
-    englishDialog.style.color = "#222";
-    englishDialog.style.margin = "0 0 7px 0";
-    englishDialog.style.textAlign = "left";
-    dialogTextGroup.appendChild(englishDialog);
-  }
-
   const dialogText = document.createElement("div");
-  dialogText.className = "dialogText mobileJapaneseQuestion";
-  dialogText.innerHTML =
-    (isMobileExamView() && savedDialogText && savedDialogText.japaneseDialog)
-      ? savedDialogText.japaneseDialog
-      : (q.dialog || "");
+  dialogText.className = "dialogText";
+  dialogText.innerHTML = q.dialog || "";
   dialogText.style.whiteSpace = "pre-line";
   dialogText.style.lineHeight = "1.4";
   dialogText.style.textAlign = "left";
-  dialogTextGroup.appendChild(dialogText);
-
-  dialogWrap.appendChild(dialogTextGroup);
+  dialogWrap.appendChild(dialogText);
 
   if(q.sideImage){
     const sideImg = document.createElement("img");
@@ -888,37 +834,7 @@ function loadDoubleQuestion(q){
 
     const title = document.createElement("div");
     title.className = "partTitle";
-
-    const fallbackPartTitle = part.title || part.question || "";
-    const englishPartTitle = getSet5EnglishPartTitle(q, partIndex);
-    const japanesePartTitle = getSet5JapanesePartTitle(
-      q,
-      partIndex,
-      fallbackPartTitle
-    );
-
-    if(isMobileExamView() && englishPartTitle && japanesePartTitle){
-      title.innerHTML = `
-        <div class="mobileEnglishPart" style="
-          font-size:16px;
-          line-height:1.4;
-          font-weight:700;
-          color:#222;
-          margin-bottom:5px;
-          text-align:left;
-        ">${englishPartTitle}</div>
-
-        <div class="mobileJapanesePart" style="
-          font-size:17px;
-          line-height:1.45;
-          font-weight:700;
-          text-align:left;
-        ">${japanesePartTitle}</div>
-      `;
-    }else{
-      title.innerHTML = fallbackPartTitle;
-    }
-
+    title.innerHTML = part.title || part.question || "";
     partBox.appendChild(title);
 
     const row = document.createElement("div");
