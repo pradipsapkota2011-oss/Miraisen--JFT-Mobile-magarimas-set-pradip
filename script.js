@@ -270,6 +270,11 @@ function setNavigationLock(lock){
 }
 
 function getLanguageEnglish(q){
+  const saved = getSet5MobileText(q);
+  if(saved && saved.englishQuestion){
+    return saved.englishQuestion;
+  }
+
   if(q.type === "double" && q.question){
     return q.question;
   }
@@ -503,6 +508,69 @@ function preloadQuestionImages(currentIndex, preloadAhead = 4){
   }
 }
 
+const SET5_MOBILE_BILINGUAL_MAP = {"1":{"englishQuestion":"Look at the illustration and choose the correct word.","japaneseQuestion":"","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"2":{"englishQuestion":"Look at the illustration and choose the correct word.","japaneseQuestion":"","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"3":{"englishQuestion":"Look at the illustration and choose the correct word.","japaneseQuestion":"","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"4":{"englishQuestion":"Look at the illustration and choose the correct word.","japaneseQuestion":"","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"5":{"englishQuestion":"I read ______ every day.","japaneseQuestion":"毎日_________を読みます 。","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"6":{"englishQuestion":"A: Could you please teach me how to use this machine?","japaneseQuestion":"A : このきかいの使いかたを__________くれませんか？","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"7":{"englishQuestion":"Every week, I work until late and then eat dinner.","japaneseQuestion":"毎週、おそくまでしごとを_______、ご飯を食べます 。","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"8":{"englishQuestion":"Last week, I had just come to Japan.","japaneseQuestion":"<span style='text-decoration:underline;'>先週</span>、日本に来たばかりです。","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"9":{"englishQuestion":"I finally passed the exam.","japaneseQuestion":"やっと試験に<span style='text-decoration:underline;'>合格</span>しました。","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"10":{"englishQuestion":"This town is a town with beautiful nature.","japaneseQuestion":"この町は<span style='text-decoration:underline;'>自然</span>がきれいな町です。","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"11":{"englishQuestion":"I learn Japanese from the teacher.","japaneseQuestion":"先生に日本語を<span style='text-decoration:underline;'>習います</span>。","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"12":{"englishQuestion":"A: What kind of work do you do at the factory?<br>B: I check parts.","japaneseQuestion":"A : こうじょうでは、_________仕事をしていますか？<br>B : ぶひんをチェックしています。","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"13":{"englishQuestion":"A: Where is the toilet?<br>B: It is _____ the entrance.","japaneseQuestion":"","japaneseDialog":"\nA :トイレはどこですか。<br>\nB : 玄関の_____です。\n","englishParts":[],"japaneseParts":[]},"14":{"englishQuestion":"A: What did you do on Sunday?<br>B: I worked. It was very ______.","japaneseQuestion":"","japaneseDialog":"\nA：日曜日に何をしましたか。<br>\nB：仕事しました。とても………………。<br>\n","englishParts":[],"japaneseParts":[]},"15":{"englishQuestion":"A: Excuse me! May I ______ this bicycle?<br>I want to go to the bookstore.<br>B: Yes, go ahead.","japaneseQuestion":"","japaneseDialog":"\nA：すみません！この自転車を………………。<br>\n　　本屋へ行きたいです。<br>\nB：ええ、どうぞ。\n","englishParts":[],"japaneseParts":[]},"16":{"englishQuestion":"A: It is beautiful, isn’t it?<br>B: Yes. Ah, ______ water?<br>A: It is not allowed inside the museum.","japaneseQuestion":"","japaneseDialog":"\nA : きれいですね。<br>\nB : そうですね。ああ、水を______。<br>\nA : びじゅつかんのなかでダメなんですよ。\n","englishParts":[],"japaneseParts":[]},"17":{"englishQuestion":"A: Excuse me. Do you know a Thai restaurant?<br>B: Yes, there is one in Hikari Park.<br>A: Do you know what time it ______?<br>B: I think around 10 o’clock.<br>A: Thank you.","japaneseQuestion":"","japaneseDialog":"\nA：あのう、すみません。タイ料理のお店知っていますか。<br>\nB：はい、光公園にありますよ。<br>\nA：何時に………………わかりますか。<br>\nB：10時ごろだと思います。<br>\nA：ありがとうございます。\n","englishParts":[],"japaneseParts":[]},"18":{"englishQuestion":"A: After leaving the company, what will you do?<br>B: I plan to start my own company. ______, I am saving money now.","japaneseQuestion":"","japaneseDialog":"\nA : 会社を出てから、何をしますか。<br>\nB : じぶんの会社をつくろうと思います。__________今、ちょうきんしています。\n","englishParts":[],"japaneseParts":[]},"19":{"englishQuestion":"A: Is that photo from your university days?<br>B: Yes, it is. The person wearing the blue dress is my girlfriend.<br>A: This photo is a memorable item, isn’t it?<br>B: Yes. I will always ______.","japaneseQuestion":"","japaneseDialog":"\nA：その写真大学のときの写真ですか。<br>\nB：はい、そうです。この青いワンピース着ているのは私の彼女なんですよ。<br>\nA：このしゃしんはおもいでのひんですね。<br>\nB：そうです。ずっと_____________\n","englishParts":[],"japaneseParts":[]},"20":{"englishQuestion":"A: That jacket looks ______! Where did you buy it?<br>B: I bought it at the supermarket in Midori Town.<br>A: It looks expensive.<br>B: It was not very expensive.","japaneseQuestion":"","japaneseDialog":"\nA：そのジャケット _____ ですね！どこで買いましたか。<br>\nB：みどり町のスーパーで買いました。<br>\nA：高そうですね<br>\nB：あまりたかくないですよ。\n","englishParts":[],"japaneseParts":[]},"21":{"englishQuestion":"A: I ______ passed the test.<br>B: Congratulations.","japaneseQuestion":"","japaneseDialog":"\nA: __________テストに合格できました。<br> \nB: おめでとうございます。\n","englishParts":[],"japaneseParts":[]},"22":{"englishQuestion":"A: Even though you have an exam tomorrow, why aren’t you studying?<br>B: I will start now.","japaneseQuestion":"","japaneseDialog":"\nA：明日、しけんがある________どうして勉強していないの<br>\nB：これからします。\n","englishParts":[],"japaneseParts":[]},"23":{"englishQuestion":"A: I am sorry for being late.<br>B: No, it’s okay.","japaneseQuestion":"","japaneseDialog":"\nA: 遅くなって、_______________ 。<br>\nB: いいえ、大丈夫です。\n","englishParts":[],"japaneseParts":[]},"24":{"englishQuestion":"A: It looks like it will keep raining from next week.<br>B: Yes, we won’t be able to do laundry at all.<br>A: ______.","japaneseQuestion":"","japaneseDialog":"\nA : 来週からずっと雨そうですね。<br>\nB : そうですね、せんたくにぜんぜんできませんね。<br>\nA : __________。\n","englishParts":[],"japaneseParts":[]},"25":{"englishQuestion":"What time does the woman wake up to prepare the meal?","japaneseQuestion":"  ごはんをつくるために、女の人は何時に起きますか。  ","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"26":{"englishQuestion":"What does Sato do first?","japaneseQuestion":"  さとうさん、は初めにに何をしますか。  ","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"27":{"englishQuestion":"What is the man’s hobby?","japaneseQuestion":"男の人の趣味は何ですか。","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"28":{"englishQuestion":"How much is the hat?","japaneseQuestion":"ぼうしはいくらですか。","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"29":{"englishQuestion":"At the zoo, what will they use to go around?","japaneseQuestion":" 動物園では、何で回りますか。 ？","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"30":{"englishQuestion":"What did the man order?","japaneseQuestion":"男の人は何を注文しましたか。?","japaneseDialog":"","englishParts":[],"japaneseParts":[]},"31":{"englishQuestion":"Listen to the audio and answer the following questions.","japaneseQuestion":"Listen the audio and answer the following questions?","japaneseDialog":"","englishParts":["(a) What floor is the fire on?","(b) Where are the stairs?"],"japaneseParts":["(a) 火事は何階ですか。？","(b)   階段はどこにありますか。  "]},"32-33":{"englishQuestion":"Listen to the following conversation and answer the questions.","japaneseQuestion":"次の会話を聞いて、質問に答えてください。","japaneseDialog":"","englishParts":["(a) What size is the paper?","(b) Where is the paper?"],"japaneseParts":["(a) 紙は何サイズですか。？","(b) ) 紙はどこにありますか。  "]},"34-35":{"englishQuestion":"Listen to the following conversation and answer the questions.","japaneseQuestion":"次の会話を聞いて、質問に答えてください。","japaneseDialog":"","englishParts":["(a) Which floor does the delivery person deliver the package to?","(b) How many boxes will he carry?"],"japaneseParts":["(a) 宅配業者はどの階に荷物を配達しますか？","(b)何箱持って行きますか。"]},"36-37":{"englishQuestion":"Read the passage and answer the following questions.","japaneseQuestion":"Read the Passage and Answer the Following Questions","japaneseDialog":"","englishParts":["(a) How did they go on the trip?","(b) What did they see while passing through the mountain road?"],"japaneseParts":["(a) なんでりょこうに行きましたか。","(b) 山の道をとおるときには何を見ましたか。"]},"38-39":{"englishQuestion":"Read the passage and answer the following questions.","japaneseQuestion":"Read the Passage and Answer the Following Questions","japaneseDialog":"","englishParts":["(a) Where is the cat?","(b) What did I do today?"],"japaneseParts":["(a) ねこはどこですか。","(b) 今日、何をしましたか？"]},"40-41":{"englishQuestion":"Read the passage and answer the following questions.","japaneseQuestion":"Read the Passage and Answer the Following Questions","japaneseDialog":"","englishParts":["(a) Why did they clean the beach?","(b) Where did they go after cleaning?"],"japaneseParts":["(a) どうして海岸を掃除しましたか。","(b) 掃除がおわったあと、どこへ行きましたか。"]},"42-43":{"englishQuestion":"Read the passage/image and answer the following questions.","japaneseQuestion":"Read the Passage and Answer the Following Questions","japaneseDialog":"","englishParts":["(a) What time does work finish on Sunday?","(b) Until when is the holiday?"],"japaneseParts":["(a) 日曜日は何時に仕事終わりますか。","(b) 休みはいつまでですか。"]},"44-45":{"englishQuestion":"Read the passage/image and answer the following questions.","japaneseQuestion":"Read the Passage and Answer the Following Questions","japaneseDialog":"","englishParts":["(a) When is the shop closed for the whole day?","(b) Today is Wednesday. What time does the shop open?"],"japaneseParts":["(a) 一日中　休みは　いつですか？","(b) 今日は水曜日です。店は何時からですか。"]},"46-47":{"englishQuestion":"Read the passage/image and answer the following questions.","japaneseQuestion":"Read the Passage and Answer the Following Questions","japaneseDialog":"","englishParts":["(a) There are many beer cans at home. When should you throw them away?","(b) Which statement about how to throw away garbage is correct?"],"japaneseParts":["(a) 家にビールのかんがたくさんあります。いつすてればいいですか？","(b) ゴミの捨て方について正しいのはどれですか。"]}};
+
+
+// =========================================================
+// SET 5 MOBILE BILINGUAL QUESTIONS
+// On mobile/tablet: English question first, Japanese directly below.
+// Desktop keeps the existing display.
+// =========================================================
+function isMobileExamView(){
+  return window.matchMedia("(max-width: 900px)").matches;
+}
+
+function getSet5MobileText(q){
+  if(!q) return null;
+  return SET5_MOBILE_BILINGUAL_MAP[String(q.id)] || null;
+}
+
+function mobileBilingualQuestionHtml(q, fallbackJapanese, className){
+  const saved = getSet5MobileText(q);
+  const english = saved ? String(saved.englishQuestion || "").trim() : "";
+  const japanese = String(
+    (saved && saved.japaneseQuestion) || fallbackJapanese || ""
+  ).trim();
+
+  if(!isMobileExamView() || !english || !japanese){
+    return `<div class="${className}">${fallbackJapanese || japanese}</div>`;
+  }
+
+  return `
+    <div class="mobileEnglishQuestion" style="
+      display:block;
+      width:100%;
+      font-size:17px;
+      line-height:1.45;
+      font-weight:700;
+      color:#222;
+      margin:7px 0 5px 0;
+      text-align:left;
+    ">${english}</div>
+
+    <div class="${className} mobileJapaneseQuestion" style="
+      display:block;
+      width:100%;
+      margin-top:3px !important;
+      text-align:left;
+    ">${japanese}</div>
+  `;
+}
+
+function getSet5EnglishPartTitle(q, partIndex){
+  const saved = getSet5MobileText(q);
+  if(!saved || !Array.isArray(saved.englishParts)) return "";
+  return String(saved.englishParts[partIndex] || "");
+}
+
+function getSet5JapanesePartTitle(q, partIndex, fallback){
+  const saved = getSet5MobileText(q);
+  if(saved && Array.isArray(saved.japaneseParts) && saved.japaneseParts[partIndex]){
+    return String(saved.japaneseParts[partIndex]);
+  }
+  return String(fallback || "");
+}
+
 function loadQuestion(){
   const q = questions[currentQuestion];
 
@@ -522,14 +590,18 @@ function loadQuestion(){
     html += `<div class="subtitle">${q.subtitle}</div>`;
   }
 
-  // Normal question: show main question here
+  // Normal question:
+  // Mobile = English first + Japanese below.
+  // Desktop = existing question display.
   if(q.question && q.type !== "dialog" && q.type !== "double"){
-    html += `<div class="mainQuestion">${q.question}</div>`;
+    html += mobileBilingualQuestionHtml(q, q.question, "mainQuestion");
   }
 
-  // Double question: show instruction/title only here
+  // Double question main prompt:
+  // Mobile = English first + Japanese below when both are available.
+  // Desktop = existing prompt.
   if(q.type === "double" && q.question){
-    html += `<div class="instruction">${q.question}</div>`;
+    html += mobileBilingualQuestionHtml(q, q.question, "instruction");
   }
 
   document.getElementById("questionText").innerHTML = html;
@@ -666,12 +738,38 @@ function loadDialogQuestion(q){
   const dialogWrap = document.createElement("div");
   dialogWrap.className = "dialogWrap";
 
+  const dialogTextGroup = document.createElement("div");
+  dialogTextGroup.style.flex = "1 1 auto";
+  dialogTextGroup.style.minWidth = "0";
+  dialogTextGroup.style.width = "100%";
+
+  const savedDialogText = getSet5MobileText(q);
+
+  if(isMobileExamView() && savedDialogText && savedDialogText.englishQuestion){
+    const englishDialog = document.createElement("div");
+    englishDialog.className = "mobileEnglishQuestion";
+    englishDialog.innerHTML = savedDialogText.englishQuestion;
+    englishDialog.style.fontSize = "17px";
+    englishDialog.style.lineHeight = "1.45";
+    englishDialog.style.fontWeight = "700";
+    englishDialog.style.color = "#222";
+    englishDialog.style.margin = "0 0 7px 0";
+    englishDialog.style.textAlign = "left";
+    dialogTextGroup.appendChild(englishDialog);
+  }
+
   const dialogText = document.createElement("div");
-  dialogText.className = "dialogText";
-  dialogText.innerHTML = q.dialog || "";
+  dialogText.className = "dialogText mobileJapaneseQuestion";
+  dialogText.innerHTML =
+    (isMobileExamView() && savedDialogText && savedDialogText.japaneseDialog)
+      ? savedDialogText.japaneseDialog
+      : (q.dialog || "");
   dialogText.style.whiteSpace = "pre-line";
   dialogText.style.lineHeight = "1.4";
-  dialogWrap.appendChild(dialogText);
+  dialogText.style.textAlign = "left";
+  dialogTextGroup.appendChild(dialogText);
+
+  dialogWrap.appendChild(dialogTextGroup);
 
   if(q.sideImage){
     const sideImg = document.createElement("img");
@@ -741,7 +839,37 @@ function loadDoubleQuestion(q){
 
     const title = document.createElement("div");
     title.className = "partTitle";
-    title.innerHTML = part.title || part.question || "";
+
+    const fallbackPartTitle = part.title || part.question || "";
+    const englishPartTitle = getSet5EnglishPartTitle(q, partIndex);
+    const japanesePartTitle = getSet5JapanesePartTitle(
+      q,
+      partIndex,
+      fallbackPartTitle
+    );
+
+    if(isMobileExamView() && englishPartTitle && japanesePartTitle){
+      title.innerHTML = `
+        <div class="mobileEnglishPart" style="
+          font-size:16px;
+          line-height:1.4;
+          font-weight:700;
+          color:#222;
+          margin-bottom:5px;
+          text-align:left;
+        ">${englishPartTitle}</div>
+
+        <div class="mobileJapanesePart" style="
+          font-size:17px;
+          line-height:1.45;
+          font-weight:700;
+          text-align:left;
+        ">${japanesePartTitle}</div>
+      `;
+    }else{
+      title.innerHTML = fallbackPartTitle;
+    }
+
     partBox.appendChild(title);
 
     const row = document.createElement("div");
