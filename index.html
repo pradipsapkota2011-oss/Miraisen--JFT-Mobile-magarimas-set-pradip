@@ -1,76 +1,106 @@
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>JFT Mock Test</title>
-<link rel="stylesheet" href="style.css?v=20260815-section-percent-guaranteed">
+<link rel="stylesheet" href="style.css?v=20260815-set5-section-percent-final">
+
+<style id="watermarkHardStop">
+#examWatermark,
+body.exam-security-active #examWatermark,
+body.exam-security-paused #examWatermark{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  width:0 !important;
+  height:0 !important;
+  overflow:hidden !important;
+  pointer-events:none !important;
+}
+</style>
+
 </head>
 
 <body>
+
 <div id="appShell">
 
-<div class="top">
-  <div id="questionInfo"><b>Question: 1</b><br><b>Section: Script and Vocabulary</b></div>
-  <div class="timer">◴ Section Time Remaining<br><b id="time">60:00</b></div>
-  <button class="finish">Finish Section</button>
-</div>
+  <div class="top">
+    <div id="questionInfo">
+      <b>Question: 1</b><br>
+      <b>Section: Script and Vocabulary</b>
+    </div>
 
-<div class="green">
-  <span>Test: Japan Foundation Test for Basic Japanese</span>
-  <span>Candidate: Miraisen Language Center</span>
-</div>
+    <div class="timer">
+      ◴ Section Time Remaining<br>
+      <b id="time">60:00</b>
+    </div>
 
-<div class="main">
-
-  <div class="sections">
-    <div id="sec1" class="sec activeSec">Script &<br>Vocabulary</div>
-    <div id="sec2" class="sec">Conversation<br>& Expression</div>
-    <div id="sec3" class="sec">Listening</div>
-    <div id="sec4" class="sec">Reading</div>
+    <button class="finish">Finish Section</button>
   </div>
 
-  <div class="palette" id="palette"></div>
-
-  <div class="content">
-    <div class="inst" id="questionText"></div>
-
-    <div class="lang">
-      <button onclick="openLanguage1()">🖼 Your Language 1 ↗</button>
-    </div>
-
-    <div class="image" id="questionImageBox">
-      <img id="questionImage" src="" alt="">
-    </div>
-
-    <div id="audioBox">
-      <audio id="audioPlayer" controls preload="auto">
-        <source id="audioSource" src="" type="audio/mpeg">
-        Your browser does not support the audio element.
-      </audio>
-    </div>
-
-    <div id="speakerBox">
-      <img id="speakerImg" src="" alt="">
-    </div>
-
-    <div id="optionContainer"></div>
+  <div class="green">
+    <span>Test: Japan Foundation Test for Basic Japanese</span>
+    <span>Candidate: Miraisen Language Center</span>
   </div>
+
+  <div class="main">
+
+    <div class="sections">
+      <div id="sec1" class="sec activeSec">Script &<br>Vocabulary</div>
+      <div id="sec2" class="sec">Conversation<br>& Expression</div>
+      <div id="sec3" class="sec">Listening</div>
+      <div id="sec4" class="sec">Reading</div>
+    </div>
+
+    <div class="palette" id="palette"></div>
+
+    <div class="content">
+
+      <div class="inst" id="questionText"></div>
+
+      <div class="lang">
+        <button type="button" onclick="openLanguage1()">🖼 Your Language 1 ↗</button>
+      </div>
+
+      <div class="image" id="questionImageBox">
+        <img id="questionImage" src="" alt="">
+      </div>
+
+      <div id="audioBox">
+        <audio id="audioPlayer" controls preload="auto">
+          <source id="audioSource" src="" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+
+      <div id="speakerBox">
+        <img id="speakerImg" src="" alt="">
+      </div>
+
+      <div id="optionContainer"></div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="icons">⚙ ▦</div>
+
+    <div>
+      <button id="flagBtn" type="button">⚑</button>
+      <button id="backBtn" type="button">‹ Back</button>
+      <button id="nextBtn" type="button">Next ›</button>
+    </div>
+  </div>
+
 </div>
 
-<div class="footer">
-  <div class="icons">⚙ ▦</div>
-  <div>
-    <button id="flagBtn">⚑</button>
-    <button id="backBtn">‹ Back</button>
-    <button id="nextBtn">Next ›</button>
-  </div>
-</div>
 
+<!-- YOUR LANGUAGE MODAL -->
 <div id="langModal1" class="modal">
   <div class="modal-head">
-    Your Language 1
+    <span>Your Language 1</span>
     <span class="close" onclick="closeLanguage1()">×</span>
   </div>
 
@@ -79,50 +109,75 @@
       <td><b>English</b></td>
       <td>Look at the illustration and choose the correct word.</td>
     </tr>
+
     <tr>
       <td><b>Nepali</b></td>
       <td>चित्र हेरेर सही शब्द छान्नुहोस्।</td>
     </tr>
   </table>
 </div>
+
+
+<!-- SUBMIT CONFIRM -->
 <div id="submitConfirmBox" class="modal">
   <div class="modal-head">
-    Submit Test
+    <span>Submit Test</span>
     <span class="close" onclick="closeSubmitConfirm()">×</span>
   </div>
+
   <div class="result-content">
     <h2>Do you want to submit the test?</h2>
-    <button onclick="submitTest()" class="confirmYes">Yes</button>
-    <button onclick="closeSubmitConfirm()" class="confirmNo">No</button>
+
+    <button
+      type="button"
+      onclick="submitTest()"
+      class="confirmYes">
+      Yes
+    </button>
+
+    <button
+      type="button"
+      onclick="closeSubmitConfirm()"
+      class="confirmNo">
+      No
+    </button>
   </div>
 </div>
+
+
+<!-- RESULT PAGE -->
 <div id="resultPage" style="display:none">
 
-    <div class="resultHeader">
-        Test Result
-    </div>
+  <div class="resultHeader">
+    Test Result
+  </div>
 
-    <div class="resultBody">
+  <div class="resultBody">
 
-        <h1>Result</h1>
+    <h1>Result</h1>
 
-        <p id="scoreText"></p>
-        <p id="correctText"></p>
-        <p id="wrongText"></p>
-        <p id="unansweredText"></p>
-        <p id="percentText"></p>
-        <div id="sectionPercentText" style="display:block;width:100%;margin-top:18px;"></div>
+    <p id="scoreText"></p>
+    <p id="correctText"></p>
+    <p id="wrongText"></p>
+    <p id="unansweredText"></p>
+    <p id="percentText"></p>
 
-        <button type="button" class="resultFinishBtn" id="resultFinishBtn">Finish</button>
+    <div id="sectionPercentText" style="display:block;width:100%;margin-top:18px;"></div>
 
-    </div>
+    <button
+      id="resultFinishBtn"
+      class="resultFinishBtn"
+      type="button"
+      onclick="if(typeof showTestFeedbackPage==='function'){showTestFeedbackPage();}else{location.reload();}">
+      Finish
+    </button>
 
+  </div>
 </div>
 
-</div>
 
-<script src="questions.js?v=20260815-section-percent-guaranteed"></script>
-<script src="script.js?v=20260815-section-percent-guaranteed"></script>
+<script src="questions.js?v=20260815-set5-section-percent-final"></script>
+<script src="script.js?v=20260815-set5-section-percent-final"></script>
 
 </body>
 </html>
