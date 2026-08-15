@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>JFT Mock Test</title>
-<link rel="stylesheet" href="style.css?v=20260815-set5-section-percent-final">
+
+<!-- Final CSS -->
+<link rel="stylesheet" href="style.css?v=20260815-image-preload-final">
 
 <style id="watermarkHardStop">
 #examWatermark,
@@ -65,7 +67,7 @@ body.exam-security-paused #examWatermark{
       </div>
 
       <div class="image" id="questionImageBox">
-        <img id="questionImage" src="" alt="">
+        <img id="questionImage" src="" alt="" decoding="async">
       </div>
 
       <div id="audioBox">
@@ -76,7 +78,7 @@ body.exam-security-paused #examWatermark{
       </div>
 
       <div id="speakerBox">
-        <img id="speakerImg" src="" alt="">
+        <img id="speakerImg" src="" alt="" decoding="async">
       </div>
 
       <div id="optionContainer"></div>
@@ -176,8 +178,9 @@ body.exam-security-paused #examWatermark{
 </div>
 
 
-<script src="questions.js?v=20260815-set5-section-percent-final"></script>
-<script src="script.js?v=20260815-set5-section-percent-final"></script>
+<!-- Questions first, then final script -->
+<script src="questions.js?v=20260815-image-preload-final"></script>
+<script src="script.js?v=20260815-image-preload-final"></script>
 
 </body>
 </html>
