@@ -9,7 +9,7 @@ export const firebaseConfig = {
   measurementId: "G-K3JHGQVKQ0"
 };
 
-export const TEST_PAGE = "index.html";
+export const TEST_PAGE = "sets.html";
 export const LOGIN_PAGE = "login.html";
 export const ADMIN_PAGE = "admin.html";
 export const ADMIN_EMAIL = "miraisen2657@gmail.com";
