@@ -1543,3 +1543,124 @@ body.result-mode .resultBody{
     padding-bottom:110px !important;
   }
 }
+
+/* =========================================================
+   SET 5 FINAL MOBILE QUESTION STACK FIX — 2026-08-15
+   Fixes the mobile layout where English/Japanese question text
+   could appear side-by-side inside #questionText (.inst).
+
+   Result on mobile/tablet:
+   - English text first
+   - Japanese text directly underneath
+   - Question area stays full-width and vertically stacked
+   - Existing options, images, footer, result and security CSS preserved
+   ========================================================= */
+
+@media (max-width: 900px){
+
+  #appShell #questionText.inst{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    height:auto !important;
+    flex:none !important;
+    float:none !important;
+    clear:both !important;
+    justify-content:flex-start !important;
+    align-items:stretch !important;
+    text-align:left !important;
+    white-space:normal !important;
+    overflow:visible !important;
+  }
+
+  #appShell #questionText.inst > .instruction,
+  #appShell #questionText.inst > .subtitle,
+  #appShell #questionText.inst > .mainQuestion,
+  #appShell #questionText.inst > .mobileEnglishQuestion,
+  #appShell #questionText.inst > .mobileJapaneseQuestion,
+  #appShell #questionText.inst > .set5EnglishQuestion,
+  #appShell #questionText.inst > .set5JapaneseQuestion{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    flex:none !important;
+    float:none !important;
+    clear:both !important;
+    box-sizing:border-box !important;
+    text-align:left !important;
+  }
+
+  #appShell #questionText .mobileEnglishQuestion,
+  #appShell #questionText .set5EnglishQuestion{
+    margin:0 0 6px 0 !important;
+    padding:0 !important;
+    line-height:1.45 !important;
+  }
+
+  #appShell #questionText .mobileJapaneseQuestion,
+  #appShell #questionText .set5JapaneseQuestion,
+  #appShell #questionText .mainQuestion{
+    margin:4px 0 0 0 !important;
+    padding-left:0 !important;
+    padding-right:0 !important;
+  }
+
+  #appShell .partTitle .mobileEnglishPart,
+  #appShell .partTitle .set5EnglishPart,
+  #appShell .partTitle .mobileJapanesePart,
+  #appShell .partTitle .set5JapanesePart{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    float:none !important;
+    clear:both !important;
+    text-align:left !important;
+  }
+
+  #appShell .partTitle .mobileEnglishPart,
+  #appShell .partTitle .set5EnglishPart{
+    margin-bottom:5px !important;
+  }
+
+  #appShell .dialogWrap > div{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+  }
+
+  #appShell .dialogWrap .mobileEnglishQuestion,
+  #appShell .dialogWrap .set5EnglishQuestion,
+  #appShell .dialogWrap .mobileJapaneseQuestion,
+  #appShell .dialogWrap .set5JapaneseQuestion,
+  #appShell .dialogWrap .dialogText{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    float:none !important;
+    clear:both !important;
+    text-align:left !important;
+  }
+}
+
+@media (max-width: 600px){
+
+  #appShell #questionText.inst{
+    padding:10px !important;
+  }
+
+  #appShell #questionText .mobileEnglishQuestion,
+  #appShell #questionText .set5EnglishQuestion{
+    font-size:15px !important;
+    line-height:1.45 !important;
+  }
+
+  #appShell #questionText .mobileJapaneseQuestion,
+  #appShell #questionText .set5JapaneseQuestion,
+  #appShell #questionText .mainQuestion{
+    font-size:18px !important;
+    line-height:1.55 !important;
+  }
+}
+
