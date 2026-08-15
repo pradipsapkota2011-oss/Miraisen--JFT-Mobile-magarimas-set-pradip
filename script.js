@@ -28,14 +28,22 @@ let examProtectionPaused = false;
 let examProtectionEmail = "";
 let examProtectionViolationCount = 0;
 
+// Safety net: if an older cached security routine recreates the watermark,
+// remove it immediately so only the test question/options remain visible.
+const examWatermarkRemovalObserver = new MutationObserver(() => {
+  const watermark = document.getElementById("examWatermark");
+  if(watermark) watermark.remove();
+});
+examWatermarkRemovalObserver.observe(document.documentElement, {
+  childList: true,
+  subtree: true
+});
+
 function ensureExamProtectionUi(){
-  let watermark = document.getElementById("examWatermark");
-  if(!watermark){
-    watermark = document.createElement("div");
-    watermark.id = "examWatermark";
-    watermark.setAttribute("aria-hidden", "true");
-    document.body.appendChild(watermark);
-  }
+  // Watermark disabled permanently.
+  // Remove any old/cached watermark node if one already exists.
+  const oldWatermark = document.getElementById("examWatermark");
+  if(oldWatermark) oldWatermark.remove();
 
   let overlay = document.getElementById("examSecurityOverlay");
   if(!overlay){
@@ -65,19 +73,13 @@ function ensureExamProtectionUi(){
     }
   }
 
-  return { watermark, overlay };
+  return { watermark: null, overlay };
 }
 
 function buildExamWatermark(email){
-  const { watermark } = ensureExamProtectionUi();
-  if(!watermark) return;
-  const safeEmail = String(email || "Approved Candidate");
-  watermark.innerHTML = "";
-  for(let i = 0; i < 18; i++){
-    const item = document.createElement("span");
-    item.textContent = `${safeEmail} • Miraisen Language Center`;
-    watermark.appendChild(item);
-  }
+  // Identity watermark intentionally disabled.
+  const watermark = document.getElementById("examWatermark");
+  if(watermark) watermark.remove();
 }
 
 function pauseListeningForSecurity(){
@@ -217,7 +219,8 @@ function startExamProtection(user){
   examProtectionPaused = false;
 
   ensureExamProtectionUi();
-  buildExamWatermark(examProtectionEmail);
+  const staleWatermark = document.getElementById("examWatermark");
+  if(staleWatermark) staleWatermark.remove();
   bindExamProtectionHandlers();
 
   document.body.classList.add("exam-security-active");
@@ -239,7 +242,7 @@ function stopExamProtection(){
   if(overlay) overlay.style.display = "none";
 
   const watermark = document.getElementById("examWatermark");
-  if(watermark) watermark.style.display = "none";
+  if(watermark) watermark.remove();
 }
 
 
@@ -729,216 +732,6 @@ function makePalette(){
   }
 }
 
-
-// =========================================================
-// SECTION-WISE RESULT
-// Uses the same section boundaries as the live test navigation.
-// Double questions count each part separately.
-// =========================================================
-function getSectionDefinitions(){
-  return [
-    { name: "Script & Vocabulary", start: 0, end: 16 },
-    { name: "Conversation & Expression", start: 16, end: 28 },
-    { name: "Listening", start: 28, end: 37 },
-    { name: "Reading", start: 37, end: questions.length }
-  ];
-}
-
-function getSectionWiseStats(){
-  return getSectionDefinitions().map(section => {
-    let correct = 0;
-    let wrong = 0;
-    let unanswered = 0;
-    let total = 0;
-
-    const safeEnd = Math.min(section.end, questions.length);
-
-    for(let index = section.start; index < safeEnd; index++){
-      const q = questions[index];
-      if(!q) continue;
-
-      if(q.type === "double" && Array.isArray(q.parts)){
-        q.parts.forEach((part, partIndex) => {
-          total++;
-
-          const selected =
-            userAnswers[index] &&
-            userAnswers[index][partIndex] !== undefined
-              ? userAnswers[index][partIndex]
-              : undefined;
-
-          if(selected === undefined || selected === null){
-            unanswered++;
-          }else if(selected === part.answer){
-            correct++;
-          }else{
-            wrong++;
-          }
-        });
-      }else{
-        total++;
-        const selected = userAnswers[index];
-
-        if(selected === undefined || selected === null){
-          unanswered++;
-        }else if(selected === q.answer){
-          correct++;
-        }else{
-          wrong++;
-        }
-      }
-    }
-
-    const percentage =
-      total > 0
-        ? Math.round((correct / total) * 100)
-        : 0;
-
-    return {
-      ...section,
-      correct,
-      wrong,
-      unanswered,
-      total,
-      percentage
-    };
-  });
-}
-
-function getSectionWisePercentHtml(){
-  const stats = getSectionWiseStats();
-
-  let html = `
-    <div style="
-      margin:24px 0 22px;
-      padding-top:18px;
-      border-top:1px solid #d8d8d8;
-    ">
-      <div style="
-        font-size:20px;
-        line-height:1.3;
-        font-weight:800;
-        margin-bottom:12px;
-        color:#111;
-      ">
-        Section-wise Performance
-      </div>
-
-      <div style="
-        display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-        gap:12px;
-        width:100%;
-      ">
-  `;
-
-  stats.forEach(section => {
-    html += `
-      <div style="
-        background:#f7f7f7;
-        border:1px solid #ddd;
-        border-radius:10px;
-        padding:13px;
-        min-width:0;
-      ">
-        <div style="
-          font-size:15px;
-          line-height:1.35;
-          font-weight:800;
-          margin-bottom:7px;
-        ">
-          ${section.name}
-        </div>
-
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          gap:10px;
-          align-items:center;
-          font-size:14px;
-          margin-bottom:8px;
-        ">
-          <span>${section.correct} / ${section.total} correct</span>
-          <strong style="font-size:18px;">${section.percentage}%</strong>
-        </div>
-
-        <div style="
-          width:100%;
-          height:9px;
-          background:#ddd;
-          border-radius:999px;
-          overflow:hidden;
-        ">
-          <div style="
-            width:${section.percentage}%;
-            height:100%;
-            background:#5b922b;
-            border-radius:999px;
-          "></div>
-        </div>
-
-        <div style="
-          margin-top:8px;
-          color:#555;
-          font-size:12px;
-          line-height:1.4;
-        ">
-          Wrong: ${section.wrong}
-          &nbsp; | &nbsp;
-          Unanswered: ${section.unanswered}
-        </div>
-      </div>
-    `;
-  });
-
-  html += `
-      </div>
-    </div>
-  `;
-
-  return html;
-}
-
-function getSectionWiseFeedbackSummaryHtml(){
-  const stats = getSectionWiseStats();
-
-  return `
-    <div style="
-      padding:12px;
-      background:#fff;
-      border-bottom:1px solid #ddd;
-    ">
-      <div style="
-        font-size:14px;
-        font-weight:800;
-        margin-bottom:9px;
-      ">
-        Section-wise Performance
-      </div>
-
-      <div style="
-        display:flex;
-        flex-wrap:wrap;
-        gap:8px;
-      ">
-        ${stats.map(section => `
-          <span style="
-            display:inline-block;
-            background:#f3f3f3;
-            border:1px solid #ddd;
-            border-radius:6px;
-            padding:7px 10px;
-            font-weight:700;
-            font-size:13px;
-          ">
-            ${section.name}: ${section.correct}/${section.total} (${section.percentage}%)
-          </span>
-        `).join("")}
-      </div>
-    </div>
-  `;
-}
-
 async function submitTest(){
   if(submitted) return;
   closeSubmitConfirm();
@@ -1018,11 +811,6 @@ async function submitTest(){
          ${status}
        </span>`;
 
-    const sectionPercentText = document.getElementById("sectionPercentText");
-    if(sectionPercentText){
-      sectionPercentText.innerHTML = getSectionWisePercentHtml();
-    }
-
     if(timerIntervalId){
       clearInterval(timerIntervalId);
       timerIntervalId = null;
@@ -1038,92 +826,9 @@ async function submitTest(){
     if(main) main.style.display = "none";
     if(footer) footer.style.display = "none";
 
-    // Stop exam protection before showing the result.
-    // Mobile browsers / Android WebView can fire blur/visibility events
-    // while switching UI state, so keeping exam protection active here
-    // can cover the result page with the security overlay.
-    stopExamProtection();
-
-    document.body.classList.remove(
-      "exam-security-active",
-      "exam-security-paused"
-    );
-
-    const securityOverlay = document.getElementById("examSecurityOverlay");
-    if(securityOverlay){
-      securityOverlay.style.display = "none";
-      securityOverlay.style.visibility = "hidden";
-      securityOverlay.style.pointerEvents = "none";
-    }
-
-    const watermark = document.getElementById("examWatermark");
-    if(watermark){
-      watermark.style.display = "none";
-      watermark.style.visibility = "hidden";
-    }
-
     // Show Result Screen
     const resultPage = document.getElementById("resultPage");
-    if(resultPage){
-      resultPage.style.setProperty("display", "block", "important");
-      resultPage.style.setProperty("visibility", "visible", "important");
-      resultPage.style.setProperty("opacity", "1", "important");
-      resultPage.style.setProperty("position", "relative", "important");
-      resultPage.style.setProperty("z-index", "100000", "important");
-      resultPage.style.width = "100%";
-      resultPage.style.minHeight = "100vh";
-      resultPage.style.height = "auto";
-      resultPage.style.overflow = "visible";
-    }
-
-    // Make sure the result page can scroll even when the old mobile CSS
-    // has html/body/#appShell locked to 100dvh with overflow:hidden !important.
-    const appShell = document.getElementById("appShell");
-
-    document.documentElement.style.setProperty("height", "auto", "important");
-    document.documentElement.style.setProperty("min-height", "100%", "important");
-    document.documentElement.style.setProperty("overflow-y", "auto", "important");
-    document.documentElement.style.setProperty("overflow-x", "hidden", "important");
-
-    document.body.style.setProperty("height", "auto", "important");
-    document.body.style.setProperty("min-height", "100vh", "important");
-    document.body.style.setProperty("max-height", "none", "important");
-    document.body.style.setProperty("overflow-y", "auto", "important");
-    document.body.style.setProperty("overflow-x", "hidden", "important");
-    document.body.style.setProperty("-webkit-overflow-scrolling", "touch", "important");
-
-    if(appShell){
-      appShell.style.setProperty("height", "auto", "important");
-      appShell.style.setProperty("min-height", "100vh", "important");
-      appShell.style.setProperty("max-height", "none", "important");
-      appShell.style.setProperty("overflow-y", "visible", "important");
-      appShell.style.setProperty("overflow-x", "hidden", "important");
-      appShell.style.setProperty("display", "block", "important");
-    }
-
-    if(resultPage){
-      resultPage.style.setProperty("height", "auto", "important");
-      resultPage.style.setProperty("min-height", "100vh", "important");
-      resultPage.style.setProperty("max-height", "none", "important");
-      resultPage.style.setProperty("overflow-y", "visible", "important");
-      resultPage.style.setProperty("overflow-x", "hidden", "important");
-
-      const resultBody = resultPage.querySelector(".resultBody");
-      if(resultBody){
-        resultBody.style.setProperty("height", "auto", "important");
-        resultBody.style.setProperty("max-height", "none", "important");
-        resultBody.style.setProperty("overflow", "visible", "important");
-        resultBody.style.setProperty("padding-bottom", "80px", "important");
-      }
-    }
-
-    // Mobile-safe scroll to the top of the result page.
-    try{
-      window.scrollTo(0, 0);
-      if(resultPage){
-        resultPage.scrollIntoView({ block: "start", inline: "nearest" });
-      }
-    }catch(_){}
+    if(resultPage) resultPage.style.display = "block";
 
     setNavigationLock(false);
     setupResultFinishButton();
@@ -1900,9 +1605,6 @@ function showTestFeedbackPage(){
         <div class="feedback-score-summary">
           ${getFeedbackScoreSummaryHtml()}
         </div>
-
-        ${getSectionWiseFeedbackSummaryHtml()}
-
         <div class="feedback-note">
           Showing all ${totalFeedbackRows} question items. Double questions are shown separately as (a) and (b).
         </div>
