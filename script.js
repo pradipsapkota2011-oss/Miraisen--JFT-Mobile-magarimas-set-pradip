@@ -1076,11 +1076,46 @@ async function submitTest(){
       resultPage.style.overflow = "visible";
     }
 
-    // Make sure the mobile page itself can scroll to the result.
-    document.documentElement.style.overflowY = "auto";
-    document.body.style.overflowY = "auto";
-    document.body.style.height = "auto";
-    document.body.style.minHeight = "100vh";
+    // Make sure the result page can scroll even when the old mobile CSS
+    // has html/body/#appShell locked to 100dvh with overflow:hidden !important.
+    const appShell = document.getElementById("appShell");
+
+    document.documentElement.style.setProperty("height", "auto", "important");
+    document.documentElement.style.setProperty("min-height", "100%", "important");
+    document.documentElement.style.setProperty("overflow-y", "auto", "important");
+    document.documentElement.style.setProperty("overflow-x", "hidden", "important");
+
+    document.body.style.setProperty("height", "auto", "important");
+    document.body.style.setProperty("min-height", "100vh", "important");
+    document.body.style.setProperty("max-height", "none", "important");
+    document.body.style.setProperty("overflow-y", "auto", "important");
+    document.body.style.setProperty("overflow-x", "hidden", "important");
+    document.body.style.setProperty("-webkit-overflow-scrolling", "touch", "important");
+
+    if(appShell){
+      appShell.style.setProperty("height", "auto", "important");
+      appShell.style.setProperty("min-height", "100vh", "important");
+      appShell.style.setProperty("max-height", "none", "important");
+      appShell.style.setProperty("overflow-y", "visible", "important");
+      appShell.style.setProperty("overflow-x", "hidden", "important");
+      appShell.style.setProperty("display", "block", "important");
+    }
+
+    if(resultPage){
+      resultPage.style.setProperty("height", "auto", "important");
+      resultPage.style.setProperty("min-height", "100vh", "important");
+      resultPage.style.setProperty("max-height", "none", "important");
+      resultPage.style.setProperty("overflow-y", "visible", "important");
+      resultPage.style.setProperty("overflow-x", "hidden", "important");
+
+      const resultBody = resultPage.querySelector(".resultBody");
+      if(resultBody){
+        resultBody.style.setProperty("height", "auto", "important");
+        resultBody.style.setProperty("max-height", "none", "important");
+        resultBody.style.setProperty("overflow", "visible", "important");
+        resultBody.style.setProperty("padding-bottom", "80px", "important");
+      }
+    }
 
     // Mobile-safe scroll to the top of the result page.
     try{
