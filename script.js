@@ -14,6 +14,235 @@ let secureSubmitResult = null;
 let timerIntervalId = null;
 let testAppStarted = false;
 
+// =========================================================
+// EXAM CAPTURE / LEAK PROTECTION (WEB BEST-EFFORT)
+// Activates ONLY after Firebase confirms an approved user and
+// startAttempt() succeeds. login.html is not affected.
+// Browser pages cannot fully block OS-level screenshots/recorders;
+// this layer hides on focus/tab changes, blocks common capture/copy/
+// print/devtools shortcuts, pauses audio, and shows an identity watermark.
+// =========================================================
+let examProtectionActive = false;
+let examProtectionHandlersBound = false;
+let examProtectionPaused = false;
+let examProtectionEmail = "";
+let examProtectionViolationCount = 0;
+
+function ensureExamProtectionUi(){
+  let watermark = document.getElementById("examWatermark");
+  if(!watermark){
+    watermark = document.createElement("div");
+    watermark.id = "examWatermark";
+    watermark.setAttribute("aria-hidden", "true");
+    document.body.appendChild(watermark);
+  }
+
+  let overlay = document.getElementById("examSecurityOverlay");
+  if(!overlay){
+    overlay = document.createElement("div");
+    overlay.id = "examSecurityOverlay";
+    overlay.innerHTML = `
+      <div class="exam-security-card">
+        <div class="exam-security-icon">🔒</div>
+        <h2>Mock Test Protected</h2>
+        <p id="examSecurityReason">For security, the test content is hidden.</p>
+        <p class="exam-security-small">Return to this tab and press Resume Test.</p>
+        <button id="examSecurityResumeBtn" type="button">Resume Test</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const resumeBtn = overlay.querySelector("#examSecurityResumeBtn");
+    if(resumeBtn){
+      resumeBtn.addEventListener("click", () => {
+        if(document.hidden || !document.hasFocus()){
+          const reason = overlay.querySelector("#examSecurityReason");
+          if(reason) reason.textContent = "Please return to this tab/window first, then press Resume Test.";
+          return;
+        }
+        resumeExamProtection();
+      });
+    }
+  }
+
+  return { watermark, overlay };
+}
+
+function buildExamWatermark(email){
+  const { watermark } = ensureExamProtectionUi();
+  if(!watermark) return;
+  const safeEmail = String(email || "Approved Candidate");
+  watermark.innerHTML = "";
+  for(let i = 0; i < 18; i++){
+    const item = document.createElement("span");
+    item.textContent = `${safeEmail} • Miraisen Language Center`;
+    watermark.appendChild(item);
+  }
+}
+
+function pauseListeningForSecurity(){
+  try{
+    const player = document.getElementById("audioPlayer");
+    if(player && !player.paused) player.pause();
+  }catch(_){}
+}
+
+function pauseExamProtection(reason){
+  if(!examProtectionActive) return;
+
+  examProtectionViolationCount++;
+  examProtectionPaused = true;
+  pauseListeningForSecurity();
+
+  const { overlay } = ensureExamProtectionUi();
+  const reasonBox = overlay ? overlay.querySelector("#examSecurityReason") : null;
+  if(reasonBox){
+    reasonBox.textContent = reason || "For security, the test content is hidden.";
+  }
+
+  document.body.classList.add("exam-security-paused");
+  if(overlay) overlay.style.display = "flex";
+}
+
+function resumeExamProtection(){
+  if(!examProtectionActive) return;
+  if(document.hidden || !document.hasFocus()) return;
+
+  examProtectionPaused = false;
+  document.body.classList.remove("exam-security-paused");
+  const overlay = document.getElementById("examSecurityOverlay");
+  if(overlay) overlay.style.display = "none";
+}
+
+function isBlockedExamShortcut(e){
+  const key = String(e.key || "").toLowerCase();
+  const ctrlOrMeta = e.ctrlKey || e.metaKey;
+
+  if(e.key === "PrintScreen" || e.key === "F12") return true;
+
+  // Print, save page, view source, copy/cut, common DevTools shortcuts.
+  if(ctrlOrMeta && ["p", "s", "u", "c", "x"].includes(key)) return true;
+  if(ctrlOrMeta && e.shiftKey && ["i", "j", "c", "s"].includes(key)) return true;
+
+  return false;
+}
+
+function bindExamProtectionHandlers(){
+  if(examProtectionHandlersBound) return;
+  examProtectionHandlersBound = true;
+
+  document.addEventListener("contextmenu", e => {
+    if(examProtectionActive) e.preventDefault();
+  }, true);
+
+  document.addEventListener("copy", e => {
+    if(examProtectionActive) e.preventDefault();
+  }, true);
+
+  document.addEventListener("cut", e => {
+    if(examProtectionActive) e.preventDefault();
+  }, true);
+
+  document.addEventListener("dragstart", e => {
+    if(examProtectionActive) e.preventDefault();
+  }, true);
+
+  document.addEventListener("selectstart", e => {
+    if(examProtectionActive && !e.target.closest("input, textarea")) e.preventDefault();
+  }, true);
+
+  document.addEventListener("keydown", e => {
+    if(!examProtectionActive) return;
+    if(isBlockedExamShortcut(e)){
+      e.preventDefault();
+      e.stopPropagation();
+      if(e.key === "PrintScreen"){
+        pauseExamProtection("Screenshot attempt detected. Test content has been hidden.");
+      }
+    }
+  }, true);
+
+  document.addEventListener("keyup", e => {
+    if(!examProtectionActive) return;
+    if(e.key === "PrintScreen"){
+      e.preventDefault();
+      pauseExamProtection("Screenshot attempt detected. Test content has been hidden.");
+      try{
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText("Miraisen JFT Mock Test — screenshot disabled during test.").catch(()=>{});
+        }
+      }catch(_){}
+    }
+  }, true);
+
+  document.addEventListener("visibilitychange", () => {
+    if(!examProtectionActive) return;
+    if(document.hidden){
+      pauseExamProtection("You left the test tab/app. Test content has been hidden.");
+    }
+  });
+
+  window.addEventListener("blur", () => {
+    if(!examProtectionActive) return;
+    setTimeout(() => {
+      if(examProtectionActive && !document.hasFocus()){
+        pauseExamProtection("The test window lost focus. Test content has been hidden.");
+      }
+    }, 80);
+  });
+
+  window.addEventListener("beforeprint", () => {
+    if(examProtectionActive){
+      pauseExamProtection("Printing is disabled during the Mock Test.");
+    }
+  });
+
+  // Block page-initiated screen sharing/capture requests while the exam is active.
+  try{
+    if(navigator.mediaDevices && typeof navigator.mediaDevices.getDisplayMedia === "function"){
+      const nativeGetDisplayMedia = navigator.mediaDevices.getDisplayMedia.bind(navigator.mediaDevices);
+      navigator.mediaDevices.getDisplayMedia = function(...args){
+        if(examProtectionActive){
+          return Promise.reject(new DOMException("Screen capture is disabled during the Mock Test.", "NotAllowedError"));
+        }
+        return nativeGetDisplayMedia(...args);
+      };
+    }
+  }catch(_){}
+}
+
+function startExamProtection(user){
+  examProtectionEmail = String(user?.email || "Approved Candidate");
+  examProtectionActive = true;
+  examProtectionPaused = false;
+
+  ensureExamProtectionUi();
+  buildExamWatermark(examProtectionEmail);
+  bindExamProtectionHandlers();
+
+  document.body.classList.add("exam-security-active");
+  document.body.classList.remove("exam-security-paused");
+
+  const sessionEmail = document.getElementById("sessionUserEmail");
+  if(sessionEmail) sessionEmail.textContent = examProtectionEmail;
+
+  const overlay = document.getElementById("examSecurityOverlay");
+  if(overlay) overlay.style.display = "none";
+}
+
+function stopExamProtection(){
+  examProtectionActive = false;
+  examProtectionPaused = false;
+  document.body.classList.remove("exam-security-active", "exam-security-paused");
+
+  const overlay = document.getElementById("examSecurityOverlay");
+  if(overlay) overlay.style.display = "none";
+
+  const watermark = document.getElementById("examWatermark");
+  if(watermark) watermark.style.display = "none";
+}
+
+
 // Listening audio control
 let audioPlayCounts = {};
 let audioCurrentKey = null;
@@ -594,9 +823,57 @@ async function submitTest(){
     if(main) main.style.display = "none";
     if(footer) footer.style.display = "none";
 
+    // Stop exam protection before showing the result.
+    // Mobile browsers / Android WebView can fire blur/visibility events
+    // while switching UI state, so keeping exam protection active here
+    // can cover the result page with the security overlay.
+    stopExamProtection();
+
+    document.body.classList.remove(
+      "exam-security-active",
+      "exam-security-paused"
+    );
+
+    const securityOverlay = document.getElementById("examSecurityOverlay");
+    if(securityOverlay){
+      securityOverlay.style.display = "none";
+      securityOverlay.style.visibility = "hidden";
+      securityOverlay.style.pointerEvents = "none";
+    }
+
+    const watermark = document.getElementById("examWatermark");
+    if(watermark){
+      watermark.style.display = "none";
+      watermark.style.visibility = "hidden";
+    }
+
     // Show Result Screen
     const resultPage = document.getElementById("resultPage");
-    if(resultPage) resultPage.style.display = "block";
+    if(resultPage){
+      resultPage.style.setProperty("display", "block", "important");
+      resultPage.style.setProperty("visibility", "visible", "important");
+      resultPage.style.setProperty("opacity", "1", "important");
+      resultPage.style.setProperty("position", "relative", "important");
+      resultPage.style.setProperty("z-index", "100000", "important");
+      resultPage.style.width = "100%";
+      resultPage.style.minHeight = "100vh";
+      resultPage.style.height = "auto";
+      resultPage.style.overflow = "visible";
+    }
+
+    // Make sure the mobile page itself can scroll to the result.
+    document.documentElement.style.overflowY = "auto";
+    document.body.style.overflowY = "auto";
+    document.body.style.height = "auto";
+    document.body.style.minHeight = "100vh";
+
+    // Mobile-safe scroll to the top of the result page.
+    try{
+      window.scrollTo(0, 0);
+      if(resultPage){
+        resultPage.scrollIntoView({ block: "start", inline: "nearest" });
+      }
+    }catch(_){}
 
     setNavigationLock(false);
     setupResultFinishButton();
@@ -1404,6 +1681,7 @@ function showTestFeedbackPage(){
 }
 
 function exitTest(){
+  stopExamProtection();
   location.reload();
 }
 
@@ -1422,6 +1700,9 @@ async function startSecureTestApplication(){
 
     const attempt = await window.jftSecurity.startAttempt(MOCK_TEST_ID);
     secureAttemptId = attempt.attemptId;
+
+    // Activate capture/leak protection only after the approved attempt really starts.
+    startExamProtection(user);
 
     loadQuestion();
     updateTimer();
