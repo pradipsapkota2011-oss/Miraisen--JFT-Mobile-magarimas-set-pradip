@@ -415,8 +415,99 @@ function updateSectionHighlight(){
     document.getElementById("sec4").classList.add("activeSec");
   }
 }
+
+// =========================================================
+// FAST QUESTION IMAGE PRELOAD
+// Keeps each Set's existing logic unchanged.
+// Preloads the current question + next 4 questions in background.
+// =========================================================
+const questionImagePreloadCache = new Map();
+
+function preloadOneQuestionImage(src){
+  if(typeof src !== "string") return;
+
+  src = src.trim();
+  if(!src || questionImagePreloadCache.has(src)) return;
+
+  const preloadImg = new Image();
+  preloadImg.decoding = "async";
+  preloadImg.loading = "eager";
+  preloadImg.src = src;
+
+  // Keep a reference so the browser/WebView can reuse the downloaded image.
+  questionImagePreloadCache.set(src, preloadImg);
+}
+
+function preloadImagesFromHtml(html){
+  if(typeof html !== "string" || !html.includes("<img")) return;
+
+  const imgRegex = /<img[^>]+src=["']([^"']+)["']/gi;
+  let match;
+
+  while((match = imgRegex.exec(html)) !== null){
+    preloadOneQuestionImage(match[1]);
+  }
+}
+
+function preloadQuestionImages(currentIndex, preloadAhead = 4){
+  if(!Array.isArray(questions) || questions.length === 0) return;
+
+  const start = Math.max(0, Number(currentIndex) || 0);
+  const end = Math.min(questions.length, start + preloadAhead + 1);
+
+  for(let i = start; i < end; i++){
+    const q = questions[i];
+    if(!q) continue;
+
+    // Main / speaker / dialog-side images
+    preloadOneQuestionImage(q.image);
+    preloadOneQuestionImage(q.speakerImage);
+    preloadOneQuestionImage(q.sideImage);
+
+    // Images that may exist inside HTML text
+    preloadImagesFromHtml(q.instruction);
+    preloadImagesFromHtml(q.subtitle);
+    preloadImagesFromHtml(q.question);
+    preloadImagesFromHtml(q.dialog);
+    preloadImagesFromHtml(q.passage);
+
+    // Normal answer-option images
+    if(Array.isArray(q.options)){
+      q.options.forEach(item => {
+        if(item && typeof item === "object"){
+          preloadOneQuestionImage(item.image);
+          preloadImagesFromHtml(item.text);
+        }
+      });
+    }
+
+    // Double-question images and option images
+    if(Array.isArray(q.parts)){
+      q.parts.forEach(part => {
+        if(!part) return;
+
+        preloadOneQuestionImage(part.image);
+        preloadImagesFromHtml(part.title);
+        preloadImagesFromHtml(part.question);
+
+        if(Array.isArray(part.options)){
+          part.options.forEach(item => {
+            if(item && typeof item === "object"){
+              preloadOneQuestionImage(item.image);
+              preloadImagesFromHtml(item.text);
+            }
+          });
+        }
+      });
+    }
+  }
+}
+
 function loadQuestion(){
   const q = questions[currentQuestion];
+
+  // Load upcoming images in the background so Next opens faster.
+  preloadQuestionImages(currentQuestion, 4);
 
   document.getElementById("questionInfo").innerHTML =
     `<b>Question: ${getSectionQuestionNumber()}</b><br><b>Section: ${getSectionName()}</b>`;
