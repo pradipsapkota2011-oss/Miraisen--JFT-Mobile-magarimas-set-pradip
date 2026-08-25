@@ -47,7 +47,11 @@ const sets=[
 {number:22,title:"そば",type:"form",link:"https://docs.google.com/forms/d/e/1FAIpQLSeQxfFB4CkqZRPmdiQjev1PWuGU_Et4l6VUmugNzMFiJ5AbwQ/viewform?usp=header"},
 {number:23,title:"コーヒー",type:"form",link:"https://docs.google.com/forms/d/e/1FAIpQLSciTns1RVMLA5ujJl_FiafwmZ_G4lGr3NcoQSlSYnfBcaevlQ/viewform?usp=header"},
 {number:24,title:"父",type:"form",link:"https://docs.google.com/forms/d/e/1FAIpQLSf842znyHBrmQBaru8jok7lYbQP5aqKr6vjpghkWT9F_FiCaA/viewform?usp=header"},
-{number:25,title:"パンダ",type:"form",link:"https://docs.google.com/forms/d/e/1FAIpQLSfbm8FlobPfCCfJ4ZWlOnrQ844NwHTYORDi_Tc__5DWTXE6Vg/viewform?usp=header"}
+{number:25,title:"パンダ",type:"form",link:"https://docs.google.com/forms/d/e/1FAIpQLSfbm8FlobPfCCfJ4ZWlOnrQ844NwHTYORDi_Tc__5DWTXE6Vg/viewform?usp=header"},
+{number:26,title:"とめます",type:"form",link:"https://docs.google.com/forms/d/e/1FAIpQLSeHRVEyqiSGRKKHudnxKvGLNjZvIoDk3CXenaApZR-VYGFYMQ/viewform?usp=header"},
+{number:27,title:"がくせい",type:"form",link:"https://docs.google.com/forms/d/e/1FAIpQLSdNq0mKvcdH-NogH_0-C3bQpgvvkqPshvBiALhBbiCBRvYlVw/viewform?usp=header"},
+{number:28,title:"まがります",type:"form",link:"https://pradipsapkota2011-oss.github.io/Miraisen--JFT-Mobile-magarimas-set-pradip/"},
+{number:29,title:"会話と表現",type:"form",link:"https://docs.google.com/forms/d/e/1FAIpQLSf70XdONSlTfuJZ7uHG2lYYH9USsh811mWFfPJz5D9AiLi5Tw/viewform?usp=header"}
 ];
 function displaySets(){document.getElementById("allSets").innerHTML=sets.map(s=>`<div class="set-card"><div class="set-number ${s.type==='form'?'google-set-number':''}">SET ${s.number}</div><h2>${s.title}</h2><p>JFT Mock Test Set ${s.number}</p><button class="start-btn ${s.type==='form'?'google-form-btn':''}" type="button" onclick="openSet('${s.link}')">Start Set ${s.number}</button></div>`).join("")}
 function extractObject(text,name){const re=new RegExp('export\\s+const\\s+'+name+'\\s*=\\s*({[\\s\\S]*?})\\s*;');const match=text.match(re);if(!match)throw new Error(name+' firebase-config.js मा भेटिएन।');return Function('"use strict";return ('+match[1]+')')()}
