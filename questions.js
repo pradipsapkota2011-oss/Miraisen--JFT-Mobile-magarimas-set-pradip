@@ -363,9 +363,9 @@ B：これからします。
   A company employee is talking in the cafe with a staff member who is leaving the company. What will the man drink?`,
   audio: "Q2.mp3",
   options: [
-    { image: "L11.png" },
+    { image: "L13.png" },
     { image: "L12.png" },
-    { image: "L13.png" }
+    { image: "L11.png" }
   ],
   marks: 5
 },
@@ -565,9 +565,9 @@ B：これからします。
     {
       title: "(b) プレゼントは何ですか？",
       options: [
-　　　　 { image: "R31.png" },
+　　　　 { image: "R33.png" },
         { image: "R32.png" },
-        { image: "R33.png" }　
+        { image: "R31.png" }　
        ],
       marks: 6
     }
