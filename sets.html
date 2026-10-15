@@ -51,7 +51,7 @@ const sets=[
 {number:26,title:"とめます",type:"form",link:"https://docs.google.com/forms/d/e/1FAIpQLSeHRVEyqiSGRKKHudnxKvGLNjZvIoDk3CXenaApZR-VYGFYMQ/viewform?usp=header"},
 {number:27,title:"がくせい",type:"form",link:"https://docs.google.com/forms/d/e/1FAIpQLSdNq0mKvcdH-NogH_0-C3bQpgvvkqPshvBiALhBbiCBRvYlVw/viewform?usp=header"},
 {number:28,title:"まがります",type:"form",link:"https://pradipsapkota2011-oss.github.io/Miraisen--JFT-Mobile-magarimas-set-pradip/"},
-{number:29,title:"会話と表現",type:"form",link:"https://docs.google.com/forms/d/e/1FAIpQLSf70XdONSlTfuJZ7uHG2lYYH9USsh811mWFfPJz5D9AiLi5Tw/viewform?usp=header"}
+{number:29,title:"会話と表現",type:"form",link:"https://docs.google.com/forms/d/e/1FAIpQLSf70XdONSlTfuJZ7uHG2lYYH9USsh811mWFfPJz5D9AiLi5Tw/viewform?usp=header"},
 {number:30,title:"おります",type:"form",link:"https://docs.google.com/forms/d/e/1FAIpQLSdrWrv-zYoISXe3oHu3mVHJq1WkIM-ziFRkfIM54FXvV7h7YA/viewform?usp=header"}
 ];
 function displaySets(){document.getElementById("allSets").innerHTML=sets.map(s=>`<div class="set-card"><div class="set-number ${s.type==='form'?'google-set-number':''}">SET ${s.number}</div><h2>${s.title}</h2><p>JFT Mock Test Set ${s.number}</p><button class="start-btn ${s.type==='form'?'google-form-btn':''}" type="button" onclick="openSet('${s.link}')">Start Set ${s.number}</button></div>`).join("")}
