@@ -565,9 +565,9 @@ B：これからします。
     {
       title: "(b) プレゼントは何ですか？",
       options: [
-　　　　 { image: "R33.png" },
+　　　　 { image: "R31.png" },
         { image: "R32.png" },
-        { image: "R31.png" }　
+        { image: "R33.png" }　
        ],
       marks: 6
     }
